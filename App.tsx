@@ -13,7 +13,7 @@ import type { Recipe } from './types';
 
 const App: React.FC = () => {
   const { authState, handleRegisteredLogin, handleGuestLogin, showAuthPage } = useAuthState();
-  const { uiState, setLoading, setError, setUpdatingRecipe, clearUI } = useUIState();
+  const { uiState, setLoading, setError, setUpdatingRecipe, clearUI, setImageFeaturesDisabled } = useUIState();
   const { 
     appData, 
     handleImageSelect, 
@@ -61,7 +61,18 @@ const App: React.FC = () => {
       }
     } catch (err) {
       console.error(err);
-      setError('An error occurred while analyzing your request. Please try again.');
+      // Check for billing-related errors specifically when an image was used
+      if (err instanceof Error && appData.imageFile && (
+          err.message.toLowerCase().includes('billing') || 
+          err.message.toLowerCase().includes('permission denied') ||
+          err.message.toLowerCase().includes('quota')
+        )) {
+        setError("Image analysis failed. This feature may require a Gemini API key with billing enabled. You can continue using text descriptions.");
+        setImageFeaturesDisabled(true);
+        handleImageSelect(null); // Clear the image from the input
+      } else {
+        setError('An error occurred while analyzing your request. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -132,6 +143,7 @@ const App: React.FC = () => {
             isLoading={uiState.isLoading}
             isGuest={isGuest}
             onNavigateToRegister={() => navigateAndClear('register')}
+            imageFeaturesDisabled={uiState.imageFeaturesDisabled}
           />
 
           {(appData.imagePreviewUrl || appData.dishDescription.trim()) && !isGuest && (

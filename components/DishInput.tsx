@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 
 interface DishInputProps {
-  onImageSelect: (file: File) => void;
+  onImageSelect: (file: File | null) => void;
   onDescriptionChange: (text: string) => void;
   onClear: () => void;
   imagePreviewUrl: string | null;
@@ -9,6 +9,7 @@ interface DishInputProps {
   isLoading: boolean;
   isGuest: boolean;
   onNavigateToRegister: () => void;
+  imageFeaturesDisabled?: boolean;
 }
 
 const UploadIcon: React.FC = () => (
@@ -45,7 +46,8 @@ export const DishInput: React.FC<DishInputProps> = ({
     description,
     isLoading,
     isGuest,
-    onNavigateToRegister
+    onNavigateToRegister,
+    imageFeaturesDisabled
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -60,7 +62,7 @@ export const DishInput: React.FC<DishInputProps> = ({
 
   const handleClearImage = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onImageSelect(null as any); // Effectively clears the image
+    onImageSelect(null); // Effectively clears the image
   };
 
   return (
@@ -96,7 +98,7 @@ export const DishInput: React.FC<DishInputProps> = ({
                   onClick={handleClearImage}
                   className="absolute -top-2 -right-2 p-1 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-500 transition-colors"
                   aria-label="Clear image"
-                  disabled={isGuest}
+                  disabled={isGuest || imageFeaturesDisabled}
                 >
                   <ClearIcon />
                 </button>
@@ -113,6 +115,12 @@ export const DishInput: React.FC<DishInputProps> = ({
             disabled={isLoading || isGuest}
         />
       </div>
+      
+      {imageFeaturesDisabled && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-3 rounded-md text-sm" role="alert">
+            <p><span className="font-bold">Note:</span> Image upload is disabled. This feature requires a Gemini API key with billing enabled. You can continue using text descriptions.</p>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-4">
         <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" ref={fileInputRef} />
@@ -120,7 +128,7 @@ export const DishInput: React.FC<DishInputProps> = ({
         
         <button 
             onClick={() => fileInputRef.current?.click()} 
-            disabled={isLoading || isGuest}
+            disabled={isLoading || isGuest || imageFeaturesDisabled}
             className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-300 text-slate-700 font-bold rounded-lg shadow-sm hover:bg-slate-50 transition-colors disabled:bg-slate-100 disabled:cursor-not-allowed"
         >
             <UploadIcon />
@@ -128,7 +136,7 @@ export const DishInput: React.FC<DishInputProps> = ({
         </button>
         <button 
             onClick={() => cameraInputRef.current?.click()} 
-            disabled={isLoading || isGuest}
+            disabled={isLoading || isGuest || imageFeaturesDisabled}
             className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-300 text-slate-700 font-bold rounded-lg shadow-sm hover:bg-slate-50 transition-colors disabled:bg-slate-100 disabled:cursor-not-allowed"
         >
             <CameraIcon />

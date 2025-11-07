@@ -4,6 +4,7 @@ interface UIState {
   isLoading: boolean;
   isUpdatingRecipe: boolean;
   error: string | null;
+  imageFeaturesDisabled: boolean;
 }
 
 export const useUIState = () => {
@@ -11,6 +12,7 @@ export const useUIState = () => {
     isLoading: false,
     isUpdatingRecipe: false,
     error: null,
+    imageFeaturesDisabled: false,
   });
 
   const setLoading = (isLoading: boolean) => {
@@ -25,8 +27,12 @@ export const useUIState = () => {
     setUiState(prev => ({ ...prev, error }));
   };
 
+  const setImageFeaturesDisabled = (disabled: boolean) => {
+    setUiState(prev => ({ ...prev, imageFeaturesDisabled: disabled }));
+  };
+
   const clearUI = () => {
-    setUiState({ isLoading: false, isUpdatingRecipe: false, error: null });
+    setUiState(prev => ({ ...prev, isLoading: false, isUpdatingRecipe: false, error: null }));
   };
 
   return {
@@ -35,5 +41,6 @@ export const useUIState = () => {
     setUpdatingRecipe,
     setError,
     clearUI,
+    setImageFeaturesDisabled,
   };
 };
