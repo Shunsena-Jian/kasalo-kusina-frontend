@@ -7,6 +7,8 @@ interface RecipeDisplayProps {
   chatHistory: ChatMessage[];
   onSendMessage: (message: string) => void;
   isAwaitingResponse: boolean;
+  isRateLimited: boolean;
+  cooldownMessage: string | null;
 }
 
 const UserMessage: React.FC<{ text: string }> = ({ text }) => (
@@ -26,7 +28,7 @@ const AiMessage: React.FC<{ text: string }> = ({ text }) => (
 );
 
 
-export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipe, chatHistory, onSendMessage, isAwaitingResponse }) => {
+export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipe, chatHistory, onSendMessage, isAwaitingResponse, isRateLimited, cooldownMessage }) => {
   const [userMessage, setUserMessage] = useState('');
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -116,13 +118,13 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipe, chatHistor
             value={userMessage}
             onChange={(e) => setUserMessage(e.target.value)}
             placeholder="e.g., 'Can I make this vegetarian?'"
-            disabled={isAwaitingResponse}
+            disabled={isAwaitingResponse || isRateLimited}
             className="flex-grow w-full px-4 py-2 bg-white/80 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-colors disabled:bg-slate-100"
             aria-label="Chat with AI assistant"
           />
           <button
             type="submit"
-            disabled={isAwaitingResponse || !userMessage.trim()}
+            disabled={isAwaitingResponse || !userMessage.trim() || isRateLimited}
             className="flex items-center justify-center gap-2 px-6 py-2 bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold rounded-lg shadow-md hover:from-sky-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-slate-100 transition-all duration-300 disabled:bg-slate-200 disabled:from-transparent disabled:to-transparent disabled:text-slate-500 disabled:cursor-not-allowed"
           >
             Send
@@ -131,6 +133,7 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipe, chatHistor
             </svg>
           </button>
         </form>
+        {cooldownMessage && <p className="text-sm text-red-600 mt-2 text-center">{cooldownMessage}</p>}
       </div>
 
       <style>{`

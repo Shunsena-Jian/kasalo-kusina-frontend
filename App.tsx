@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Header } from './components/Header';
 import { DishInput } from './components/DishInput';
 import { RecipeDisplay } from './components/RecipeDisplay';
@@ -26,6 +26,53 @@ const App: React.FC = () => {
     onClear: () => clearUI(),
   });
 
+  // --- Rate Limiter Logic ---
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [isFreeTier, setIsFreeTier] = useState(false);
+  const requestTimestamps = useRef<number[]>([]);
+  const [cooldownMessage, setCooldownMessage] = useState<string | null>(null);
+
+  const RATE_LIMIT_COUNT = 15;
+  const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+
+  const checkAndRecordRequest = useCallback((): boolean => {
+      if (!isFreeTier) {
+          return true; // Not in free tier mode, allow all requests.
+      }
+
+      const now = Date.now();
+      
+      requestTimestamps.current = requestTimestamps.current.filter(
+          timestamp => now - timestamp < RATE_LIMIT_WINDOW_MS
+      );
+
+      if (requestTimestamps.current.length >= RATE_LIMIT_COUNT) {
+          const oldestRequest = requestTimestamps.current[0];
+          const secondsToWait = Math.ceil((RATE_LIMIT_WINDOW_MS - (now - oldestRequest)) / 1000);
+          setCooldownMessage(`Rate limit reached. Please wait ${secondsToWait} seconds.`);
+          setIsRateLimited(true);
+          
+          setTimeout(() => {
+              setIsRateLimited(false);
+              setCooldownMessage(null);
+          }, secondsToWait * 1000);
+
+          return false;
+      }
+
+      requestTimestamps.current.push(now);
+      setIsRateLimited(false);
+      setCooldownMessage(null);
+      return true;
+  }, [isFreeTier]);
+
+  const activateFreeTierMode = useCallback(() => {
+      if (!isFreeTier) {
+          setIsFreeTier(true);
+      }
+  }, [isFreeTier]);
+  // --- End Rate Limiter Logic ---
+
   const isGuest = authState.userType === 'guest';
 
   const handleFullClear = () => {
@@ -40,6 +87,8 @@ const App: React.FC = () => {
   const handleAnalyzeClick = async () => {
     if (!appData.imageFile && !appData.dishDescription.trim()) return;
     
+    if (!checkAndRecordRequest()) return;
+
     setLoading(true);
     setError(null);
     setRecipe(null);
@@ -53,7 +102,6 @@ const App: React.FC = () => {
         setRecipe(null);
       } else {
         setRecipe(generatedRecipe);
-        // Add a welcome message from the AI to kick off the chat
         addMessageToHistory({
           sender: 'ai',
           text: `I've found a recipe for ${generatedRecipe.dishName}! Feel free to ask me any questions or suggest changes.`
@@ -61,17 +109,23 @@ const App: React.FC = () => {
       }
     } catch (err) {
       console.error(err);
-      // Check for billing-related errors specifically when an image was used
-      if (err instanceof Error && appData.imageFile && (
-          err.message.toLowerCase().includes('billing') || 
-          err.message.toLowerCase().includes('permission denied') ||
-          err.message.toLowerCase().includes('quota')
-        )) {
-        setError("Image analysis failed. This feature may require a Gemini API key with billing enabled. You can continue using text descriptions.");
-        setImageFeaturesDisabled(true);
-        handleImageSelect(null); // Clear the image from the input
+      if (err instanceof Error) {
+        const lowerCaseError = err.message.toLowerCase();
+        if (lowerCaseError.includes('429') || lowerCaseError.includes('quota')) {
+            activateFreeTierMode();
+            setError("It looks like you're using a free tier API key. To prevent errors, requests will now be rate-limited. Please try again in a moment.");
+        } else if (appData.imageFile && (
+            lowerCaseError.includes('billing') || 
+            lowerCaseError.includes('permission denied')
+          )) {
+          setError("Image analysis failed. This feature may require a Gemini API key with billing enabled. You can continue using text descriptions.");
+          setImageFeaturesDisabled(true);
+          handleImageSelect(null);
+        } else {
+          setError('An error occurred while analyzing your request. Please try again.');
+        }
       } else {
-        setError('An error occurred while analyzing your request. Please try again.');
+         setError('An unexpected error occurred. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -80,6 +134,8 @@ const App: React.FC = () => {
 
   const handleSendChatMessage = async (message: string) => {
     if (!appData.recipe || !message.trim()) return;
+
+    if (!checkAndRecordRequest()) return;
 
     addMessageToHistory({ sender: 'user', text: message });
     setUpdatingRecipe(true);
@@ -93,7 +149,11 @@ const App: React.FC = () => {
         }
     } catch (err) {
         console.error(err);
-        const errorMessage = 'Sorry, I encountered an error. Please try that again.';
+        let errorMessage = 'Sorry, I encountered an error. Please try that again.';
+        if (err instanceof Error && (err.message.toLowerCase().includes('429') || err.message.toLowerCase().includes('quota'))) {
+            activateFreeTierMode();
+            errorMessage = "Rate limit reached. Please wait a moment before sending another message.";
+        }
         addMessageToHistory({ sender: 'ai', text: errorMessage });
         setError(errorMessage);
     } finally {
@@ -134,6 +194,11 @@ const App: React.FC = () => {
       />
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-6 md:p-8 space-y-6 border border-black/5">
+          {isFreeTier && (
+            <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3 rounded-md text-sm mb-4" role="alert">
+                <p><span className="font-bold">Heads up:</span> Free tier rate limiting is active to prevent API errors. Requests are limited to 15 per minute.</p>
+            </div>
+          )}
           <DishInput
             onImageSelect={handleImageSelect}
             onDescriptionChange={handleDescriptionChange}
@@ -150,7 +215,7 @@ const App: React.FC = () => {
             <div className="flex flex-col items-center">
               <button
                 onClick={handleAnalyzeClick}
-                disabled={uiState.isLoading}
+                disabled={uiState.isLoading || isRateLimited}
                 className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold rounded-lg shadow-lg hover:from-sky-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-100 transition-all duration-300 disabled:bg-slate-200 disabled:from-transparent disabled:to-transparent disabled:text-slate-500 disabled:cursor-not-allowed"
               >
                 {uiState.isLoading ? (
@@ -167,6 +232,7 @@ const App: React.FC = () => {
                   </>
                 )}
               </button>
+              {cooldownMessage && <p className="text-sm text-red-600 mt-2 text-center">{cooldownMessage}</p>}
             </div>
           )}
         </div>
@@ -188,6 +254,8 @@ const App: React.FC = () => {
                 chatHistory={appData.chatHistory}
                 onSendMessage={handleSendChatMessage}
                 isAwaitingResponse={uiState.isUpdatingRecipe}
+                isRateLimited={isRateLimited}
+                cooldownMessage={cooldownMessage}
             />
           ) : !uiState.isLoading && !appData.imagePreviewUrl && !appData.dishDescription.trim() && (
             <WelcomeMessage />

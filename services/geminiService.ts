@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type, Modality } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import type { Recipe, ChatMessage } from "../types";
 
 const fileToGenerativePart = async (file: File) => {
@@ -42,7 +42,6 @@ const RECIPE_SCHEMA = {
 export const analyzeDish = async (imageFile: File | null, description: string): Promise<Recipe> => {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
-    // Fix: The prompt parts for a multipart request should be an array of Part objects (e.g. {text: string} or {inlineData: ...}), not a mix of objects and strings.
     const promptParts: ({ text: string } | { inlineData: { data: string; mimeType: string; } })[] = [];
     
     let promptText = `
@@ -75,32 +74,7 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
     const recipeResponseText = recipeResult.text.trim();
     const recipeData: Omit<Recipe, 'imageUrl'> = JSON.parse(recipeResponseText);
 
-    if (recipeData.dishName.toLowerCase() === 'unknown dish') {
-        return { ...recipeData, imageUrl: undefined };
-    }
-
-    // Generate an image for the identified dish, whether from text or image
-    const imageResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
-        contents: {
-            parts: [{ text: `A delicious-looking, professionally photographed plate of Filipino ${recipeData.dishName}` }],
-        },
-        config: {
-            responseModalities: [Modality.IMAGE],
-        },
-    });
-
-    let imageUrl: string | undefined = imageFile ? URL.createObjectURL(imageFile) : undefined;
-    
-    if (!imageFile) {
-        for (const part of imageResponse.candidates[0].content.parts) {
-            if (part.inlineData) {
-                const base64ImageBytes: string = part.inlineData.data;
-                imageUrl = `data:${part.inlineData.mimeType};base64,${base64ImageBytes}`;
-                break;
-            }
-        }
-    }
+    const imageUrl = imageFile ? URL.createObjectURL(imageFile) : undefined;
 
     return { ...recipeData, imageUrl };
 };
