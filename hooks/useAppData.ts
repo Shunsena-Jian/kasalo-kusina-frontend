@@ -9,11 +9,7 @@ interface AppDataState {
   chatHistory: ChatMessage[];
 }
 
-interface UseAppDataProps {
-  onClear: () => void;
-}
-
-export const useAppData = ({ onClear }: UseAppDataProps) => {
+export const useAppData = () => {
   const [appData, setAppData] = useState<AppDataState>({
     imageFile: null,
     imagePreviewUrl: null,
@@ -21,6 +17,14 @@ export const useAppData = ({ onClear }: UseAppDataProps) => {
     recipe: null,
     chatHistory: [],
   });
+
+  const resetRecipeAndChat = () => {
+    setAppData(prev => ({
+      ...prev,
+      recipe: null,
+      chatHistory: [],
+    }));
+  };
 
   const handleImageSelect = useCallback((file: File | null) => {
     if (appData.imagePreviewUrl) {
@@ -30,18 +34,16 @@ export const useAppData = ({ onClear }: UseAppDataProps) => {
       ...prev,
       imageFile: file,
       imagePreviewUrl: file ? URL.createObjectURL(file) : null,
-      recipe: null,
-      chatHistory: [],
     }));
+    resetRecipeAndChat();
   }, [appData.imagePreviewUrl]);
 
   const handleDescriptionChange = useCallback((description: string) => {
     setAppData(prev => ({
         ...prev,
         dishDescription: description,
-        recipe: null,
-        chatHistory: [],
       }));
+    resetRecipeAndChat();
   }, []);
 
   const handleClear = useCallback(() => {
@@ -55,8 +57,7 @@ export const useAppData = ({ onClear }: UseAppDataProps) => {
       recipe: null,
       chatHistory: [],
     });
-    onClear();
-  }, [appData.imagePreviewUrl, onClear]);
+  }, [appData.imagePreviewUrl]);
 
   const setRecipe = (recipe: Recipe | null) => {
     setAppData(prev => ({ ...prev, recipe }));
@@ -70,19 +71,6 @@ export const useAppData = ({ onClear }: UseAppDataProps) => {
     setAppData(prev => ({...prev, chatHistory: []}));
   };
 
-  const clearAppData = () => {
-    if (appData.imagePreviewUrl) {
-        URL.revokeObjectURL(appData.imagePreviewUrl);
-    }
-    setAppData({
-        imageFile: null,
-        imagePreviewUrl: null,
-        dishDescription: '',
-        recipe: null,
-        chatHistory: [],
-    });
-  };
-
   return {
     appData,
     handleImageSelect,
@@ -91,6 +79,5 @@ export const useAppData = ({ onClear }: UseAppDataProps) => {
     setRecipe,
     addMessageToHistory,
     clearChatHistory,
-    clearAppData
   };
 };

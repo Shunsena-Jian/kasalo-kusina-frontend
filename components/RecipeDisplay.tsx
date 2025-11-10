@@ -127,10 +127,19 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipe, chatHistor
             disabled={isAwaitingResponse || !userMessage.trim() || isRateLimited}
             className="flex items-center justify-center gap-2 px-6 py-2 bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold rounded-lg shadow-md hover:from-sky-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-slate-100 transition-all duration-300 disabled:bg-slate-200 disabled:from-transparent disabled:to-transparent disabled:text-slate-500 disabled:cursor-not-allowed"
           >
-            Send
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-            </svg>
+            {isAwaitingResponse ? (
+              <>
+                <LoadingSpinner />
+                Sending...
+              </>
+            ) : (
+              <>
+                Send
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                </svg>
+              </>
+            )}
           </button>
         </form>
         {cooldownMessage && <p className="text-sm text-red-600 mt-2 text-center">{cooldownMessage}</p>}

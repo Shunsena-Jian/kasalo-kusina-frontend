@@ -83,7 +83,11 @@ export const DishInput: React.FC<DishInputProps> = ({
        <div className="flex justify-between items-center">
          <label htmlFor="dish-description" className="block text-lg font-semibold text-slate-700">Describe a Filipino Dish</label>
          {(imagePreviewUrl || description) && (
-            <button onClick={onClear} className="text-sm font-medium text-slate-500 hover:text-red-600 transition-colors flex items-center gap-1">
+            <button onClick={() => {
+                if (window.confirm('Are you sure you want to clear the form?')) {
+                    onClear();
+                }
+            }} className="text-sm font-medium text-slate-500 hover:text-red-600 transition-colors flex items-center gap-1">
                 <ClearIcon />
                 Clear All
             </button>

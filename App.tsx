@@ -11,6 +11,9 @@ import { useAppData } from './hooks/useAppData';
 import { useUIState } from './hooks/useUIState';
 import type { Recipe } from './types';
 
+const RATE_LIMIT_COUNT = 15;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+
 const App: React.FC = () => {
   const { authState, handleRegisteredLogin, handleGuestLogin, showAuthPage } = useAuthState();
   const { uiState, setLoading, setError, setUpdatingRecipe, clearUI, setImageFeaturesDisabled } = useUIState();
@@ -22,18 +25,13 @@ const App: React.FC = () => {
     setRecipe, 
     addMessageToHistory,
     clearChatHistory
-  } = useAppData({
-    onClear: () => clearUI(),
-  });
+  } = useAppData();
 
   // --- Rate Limiter Logic ---
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [isFreeTier, setIsFreeTier] = useState(false);
   const requestTimestamps = useRef<number[]>([]);
   const [cooldownMessage, setCooldownMessage] = useState<string | null>(null);
-
-  const RATE_LIMIT_COUNT = 15;
-  const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
   const checkAndRecordRequest = useCallback((): boolean => {
       if (!isFreeTier) {
@@ -77,6 +75,7 @@ const App: React.FC = () => {
 
   const handleFullClear = () => {
     handleClear();
+    clearUI();
   };
   
   const navigateAndClear = (page: 'login' | 'register') => {
@@ -109,23 +108,16 @@ const App: React.FC = () => {
       }
     } catch (err) {
       console.error(err);
-      if (err instanceof Error) {
-        const lowerCaseError = err.message.toLowerCase();
-        if (lowerCaseError.includes('429') || lowerCaseError.includes('quota')) {
-            activateFreeTierMode();
-            setError("It looks like you're using a free tier API key. To prevent errors, requests will now be rate-limited. Please try again in a moment.");
-        } else if (appData.imageFile && (
-            lowerCaseError.includes('billing') || 
-            lowerCaseError.includes('permission denied')
-          )) {
-          setError("Image analysis failed. This feature may require a Gemini API key with billing enabled. You can continue using text descriptions.");
-          setImageFeaturesDisabled(true);
-          handleImageSelect(null);
-        } else {
-          setError('An error occurred while analyzing your request. Please try again.');
-        }
+      const errorMessage = err instanceof Error ? err.message.toLowerCase() : '';
+      if (errorMessage.includes('429') || errorMessage.includes('quota')) {
+          activateFreeTierMode();
+          setError("It looks like you're using a free tier API key. To prevent errors, requests will now be rate-limited. Please try again in a moment.");
+      } else if (appData.imageFile && (errorMessage.includes('billing') || errorMessage.includes('permission denied'))) {
+        setError("Image analysis failed. This feature may require a Gemini API key with billing enabled. You can continue using text descriptions.");
+        setImageFeaturesDisabled(true);
+        handleImageSelect(null);
       } else {
-         setError('An unexpected error occurred. Please try again.');
+        setError('An error occurred while analyzing your request. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -139,7 +131,7 @@ const App: React.FC = () => {
 
     addMessageToHistory({ sender: 'user', text: message });
     setUpdatingRecipe(true);
-    setError(null);
+setError(null);
 
     try {
         const result = await continueRecipeConversation(appData.recipe, appData.chatHistory, message);
@@ -149,13 +141,14 @@ const App: React.FC = () => {
         }
     } catch (err) {
         console.error(err);
-        let errorMessage = 'Sorry, I encountered an error. Please try that again.';
-        if (err instanceof Error && (err.message.toLowerCase().includes('429') || err.message.toLowerCase().includes('quota'))) {
+        const errorMessage = err instanceof Error ? err.message.toLowerCase() : '';
+        let displayMessage = 'Sorry, I encountered an error. Please try that again.';
+        if (errorMessage.includes('429') || errorMessage.includes('quota')) {
             activateFreeTierMode();
-            errorMessage = "Rate limit reached. Please wait a moment before sending another message.";
+            displayMessage = "Rate limit reached. Please wait a moment before sending another message.";
         }
-        addMessageToHistory({ sender: 'ai', text: errorMessage });
-        setError(errorMessage);
+        addMessageToHistory({ sender: 'ai', text: displayMessage });
+        setError(displayMessage);
     } finally {
         setUpdatingRecipe(false);
     }
