@@ -49,8 +49,8 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
         User's text description: "${description || 'No description provided.'}"
         
         1. Identify the specific name of the dish from the image and/or text.
-        2. Provide a comprehensive list of ingredients with quantities.
-        3. Provide the detailed step-by-step cooking directions.
+        2. Provide a comprehensive list of authentic ingredients with quantities.
+        3. Provide detailed, step-by-step cooking directions that respect traditional Filipino cooking methods.
 
         Return the response in JSON format. If you cannot confidently identify the dish as Filipino cuisine, return a JSON object with a "dishName" of "Unknown Dish" and empty arrays for ingredients and directions.
     `;
@@ -63,11 +63,12 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
     promptParts.push({ text: promptText });
 
     const recipeResult = await ai.models.generateContent({
-        model: 'gemini-2.5-pro',
+        model: 'gemini-3-pro-preview',
         contents: { parts: promptParts },
         config: {
             responseMimeType: 'application/json',
             responseSchema: RECIPE_SCHEMA,
+            thinkingConfig: { thinkingBudget: 2048 }
         },
     });
 
@@ -110,7 +111,7 @@ export const continueRecipeConversation = async (
     const historyForPrompt = chatHistory.map(msg => `${msg.sender === 'user' ? 'User' : 'AI'}: ${msg.text}`).join('\n');
 
     const prompt = `
-      You are "Kusina Assistant", an expert Filipino chef AI. You are having a conversation with a user about a recipe for "${currentRecipe.dishName}".
+      You are "Kusina Assistant", a warm and expert Filipino chef. You are having a conversation with a user about a recipe for "${currentRecipe.dishName}".
 
       Current Recipe:
       - Ingredients: ${JSON.stringify(currentRecipe.ingredients)}
@@ -122,23 +123,24 @@ export const continueRecipeConversation = async (
       User's new message: "${newUserMessage}"
 
       Your tasks:
-      1. Analyze the user's message to understand their intent (e.g., asking a question, requesting a modification like adding/removing an ingredient, asking for suggestions).
-      2. Formulate a helpful, conversational \`responseText\`.
+      1. Analyze the user's message to understand their intent.
+      2. Formulate a helpful, conversational \`responseText\`. Be encouraging and helpful, like a mentor.
       3. If the user's request requires changing the recipe:
-          a. Determine if the change is feasible and makes sense for the dish.
-          b. If it is, create a complete, updated version of the recipe. Integrate the change naturally into the ingredients and directions.
+          a. Determine if the change is feasible.
+          b. If it is, create a complete, updated version of the recipe.
           c. Set \`recipeUpdated\` to true and provide the full \`updatedRecipe\` object.
-      4. If the user is just asking a question or the request doesn't change the recipe, set \`recipeUpdated\` to false and do not provide the \`updatedRecipe\` object.
+      4. If the user is just asking a question or the request doesn't change the recipe, set \`recipeUpdated\` to false.
 
       Respond STRICTLY in the JSON format defined by the schema.
     `;
 
     const result = await ai.models.generateContent({
-        model: 'gemini-2.5-pro',
+        model: 'gemini-3-pro-preview',
         contents: prompt,
         config: {
             responseMimeType: 'application/json',
             responseSchema: CHAT_RESPONSE_SCHEMA,
+            thinkingConfig: { thinkingBudget: 1024 }
         },
     });
 

@@ -11,9 +11,6 @@ import { useAppData } from './hooks/useAppData';
 import { useUIState } from './hooks/useUIState';
 import type { Recipe } from './types';
 
-const RATE_LIMIT_COUNT = 15;
-const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-
 const App: React.FC = () => {
   const { authState, handleRegisteredLogin, handleGuestLogin, showAuthPage } = useAuthState();
   const { uiState, setLoading, setError, setUpdatingRecipe, clearUI, setImageFeaturesDisabled } = useUIState();
@@ -25,7 +22,9 @@ const App: React.FC = () => {
     setRecipe, 
     addMessageToHistory,
     clearChatHistory
-  } = useAppData();
+  } = useAppData({
+    onClear: () => clearUI(),
+  });
 
   // --- Rate Limiter Logic ---
   const [isRateLimited, setIsRateLimited] = useState(false);
@@ -33,9 +32,12 @@ const App: React.FC = () => {
   const requestTimestamps = useRef<number[]>([]);
   const [cooldownMessage, setCooldownMessage] = useState<string | null>(null);
 
+  const RATE_LIMIT_COUNT = 15;
+  const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+
   const checkAndRecordRequest = useCallback((): boolean => {
       if (!isFreeTier) {
-          return true; // Not in free tier mode, allow all requests.
+          return true; 
       }
 
       const now = Date.now();
@@ -75,7 +77,6 @@ const App: React.FC = () => {
 
   const handleFullClear = () => {
     handleClear();
-    clearUI();
   };
   
   const navigateAndClear = (page: 'login' | 'register') => {
@@ -103,21 +104,28 @@ const App: React.FC = () => {
         setRecipe(generatedRecipe);
         addMessageToHistory({
           sender: 'ai',
-          text: `I've found a recipe for ${generatedRecipe.dishName}! Feel free to ask me any questions or suggest changes.`
+          text: `Magandang araw! I've found a delicious recipe for **${generatedRecipe.dishName}**! I'm here to help you cook it perfectly. Do you have any questions about the ingredients?`
         });
       }
     } catch (err) {
       console.error(err);
-      const errorMessage = err instanceof Error ? err.message.toLowerCase() : '';
-      if (errorMessage.includes('429') || errorMessage.includes('quota')) {
-          activateFreeTierMode();
-          setError("It looks like you're using a free tier API key. To prevent errors, requests will now be rate-limited. Please try again in a moment.");
-      } else if (appData.imageFile && (errorMessage.includes('billing') || errorMessage.includes('permission denied'))) {
-        setError("Image analysis failed. This feature may require a Gemini API key with billing enabled. You can continue using text descriptions.");
-        setImageFeaturesDisabled(true);
-        handleImageSelect(null);
+      if (err instanceof Error) {
+        const lowerCaseError = err.message.toLowerCase();
+        if (lowerCaseError.includes('429') || lowerCaseError.includes('quota')) {
+            activateFreeTierMode();
+            setError("It looks like you're using a free tier API key. To prevent errors, requests will now be rate-limited. Please try again in a moment.");
+        } else if (appData.imageFile && (
+            lowerCaseError.includes('billing') || 
+            lowerCaseError.includes('permission denied')
+          )) {
+          setError("Image analysis failed. This feature may require a Gemini API key with billing enabled. You can continue using text descriptions.");
+          setImageFeaturesDisabled(true);
+          handleImageSelect(null);
+        } else {
+          setError('An error occurred while analyzing your request. Please try again.');
+        }
       } else {
-        setError('An error occurred while analyzing your request. Please try again.');
+         setError('An unexpected error occurred. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -131,7 +139,7 @@ const App: React.FC = () => {
 
     addMessageToHistory({ sender: 'user', text: message });
     setUpdatingRecipe(true);
-setError(null);
+    setError(null);
 
     try {
         const result = await continueRecipeConversation(appData.recipe, appData.chatHistory, message);
@@ -141,26 +149,18 @@ setError(null);
         }
     } catch (err) {
         console.error(err);
-        const errorMessage = err instanceof Error ? err.message.toLowerCase() : '';
-        let displayMessage = 'Sorry, I encountered an error. Please try that again.';
-        if (errorMessage.includes('429') || errorMessage.includes('quota')) {
+        let errorMessage = 'Sorry, I encountered an error. Please try that again.';
+        if (err instanceof Error && (err.message.toLowerCase().includes('429') || err.message.toLowerCase().includes('quota'))) {
             activateFreeTierMode();
-            displayMessage = "Rate limit reached. Please wait a moment before sending another message.";
+            errorMessage = "Rate limit reached. Please wait a moment before sending another message.";
         }
-        addMessageToHistory({ sender: 'ai', text: displayMessage });
-        setError(displayMessage);
+        addMessageToHistory({ sender: 'ai', text: errorMessage });
+        setError(errorMessage);
     } finally {
         setUpdatingRecipe(false);
     }
   };
 
-
-  const WelcomeMessage: React.FC = () => (
-    <div className="text-center p-8 bg-white/50 backdrop-blur-xl rounded-2xl border border-black/5 shadow-lg">
-      <h2 className="text-2xl font-bold text-indigo-600 mb-2">Welcome to Kasalo Kusina!</h2>
-      <p className="text-slate-600">Ready to discover a recipe? Upload a photo, describe a Filipino dish, or do both to get started.</p>
-    </div>
-  );
 
   if (!authState.isAuthenticated) {
     if (authState.page === 'login') {
@@ -178,83 +178,106 @@ setError(null);
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <Header 
         userType={authState.userType} 
         onLogout={() => navigateAndClear('login')}
         onNavigateToLogin={() => navigateAndClear('login')}
         onNavigateToRegister={() => navigateAndClear('register')}
       />
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-6 md:p-8 space-y-6 border border-black/5">
-          {isFreeTier && (
-            <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3 rounded-md text-sm mb-4" role="alert">
-                <p><span className="font-bold">Heads up:</span> Free tier rate limiting is active to prevent API errors. Requests are limited to 15 per minute.</p>
+      <main className="flex-grow container mx-auto px-4 py-12 max-w-6xl">
+        
+        {isFreeTier && (
+            <div className="max-w-3xl mx-auto mb-6 bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-4 rounded-md shadow-sm text-sm flex items-center gap-3" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                <p><span className="font-bold">Free Tier Active:</span> Requests are limited to 15 per minute.</p>
             </div>
-          )}
-          <DishInput
-            onImageSelect={handleImageSelect}
-            onDescriptionChange={handleDescriptionChange}
-            onClear={handleFullClear}
-            imagePreviewUrl={appData.imagePreviewUrl}
-            description={appData.dishDescription}
-            isLoading={uiState.isLoading}
-            isGuest={isGuest}
-            onNavigateToRegister={() => navigateAndClear('register')}
-            imageFeaturesDisabled={uiState.imageFeaturesDisabled}
-          />
+        )}
 
-          {(appData.imagePreviewUrl || appData.dishDescription.trim()) && !isGuest && (
-            <div className="flex flex-col items-center">
-              <button
-                onClick={handleAnalyzeClick}
-                disabled={uiState.isLoading || isRateLimited}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold rounded-lg shadow-lg hover:from-sky-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-100 transition-all duration-300 disabled:bg-slate-200 disabled:from-transparent disabled:to-transparent disabled:text-slate-500 disabled:cursor-not-allowed"
-              >
-                {uiState.isLoading ? (
-                  <>
-                    <LoadingSpinner />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                    Find my dish!
-                  </>
-                )}
-              </button>
-              {cooldownMessage && <p className="text-sm text-red-600 mt-2 text-center">{cooldownMessage}</p>}
-            </div>
-          )}
+        {/* Input Section */}
+        <div className={`transition-all duration-700 ease-in-out ${appData.recipe ? 'hidden' : 'block'}`}>
+            <DishInput
+                onImageSelect={handleImageSelect}
+                onDescriptionChange={handleDescriptionChange}
+                onClear={handleFullClear}
+                imagePreviewUrl={appData.imagePreviewUrl}
+                description={appData.dishDescription}
+                isLoading={uiState.isLoading}
+                isGuest={isGuest}
+                onNavigateToRegister={() => navigateAndClear('register')}
+                imageFeaturesDisabled={uiState.imageFeaturesDisabled}
+            />
+
+            {(appData.imagePreviewUrl || appData.dishDescription.trim()) && !isGuest && (
+                <div className="flex flex-col items-center mt-8 animate-fade-in">
+                <button
+                    onClick={handleAnalyzeClick}
+                    disabled={uiState.isLoading || isRateLimited}
+                    className="w-full sm:w-auto min-w-[240px] flex items-center justify-center gap-3 px-8 py-4 bg-slate-900 text-white font-bold rounded-full shadow-xl shadow-slate-400/30 hover:bg-orange-600 hover:shadow-orange-500/30 focus:outline-none focus:ring-4 focus:ring-orange-500/20 transition-all duration-300 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed transform hover:-translate-y-1"
+                >
+                    {uiState.isLoading ? (
+                    <>
+                        <LoadingSpinner />
+                        Cooking up results...
+                    </>
+                    ) : (
+                    <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        Find Recipe
+                    </>
+                    )}
+                </button>
+                {cooldownMessage && <p className="text-sm text-red-500 mt-3 font-medium">{cooldownMessage}</p>}
+                </div>
+            )}
         </div>
 
-        <div className="mt-8">
+        {/* Results Section */}
+        <div className="mt-6">
           {uiState.isLoading && (
-            <div className="text-center p-8 bg-white/50 backdrop-blur-xl rounded-2xl border border-black/5">
-                <div className="flex justify-center items-center gap-4 text-indigo-600">
-                    <LoadingSpinner />
-                    <p className="text-lg">Identifying dish and generating recipe...</p>
-                </div>
+             <div className="flex flex-col items-center justify-center py-24 animate-pulse">
+                <div className="w-16 h-16 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-6"></div>
+                <p className="text-xl font-medium text-slate-600">The chef is identifying your dish...</p>
+                <p className="text-slate-400 text-sm mt-2">Using Gemini 3.0 Reasoning</p>
             </div>
           )}
-          {uiState.error && !appData.recipe && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center mb-4" role="alert">{uiState.error}</div>}
+
+          {uiState.error && !appData.recipe && (
+            <div className="max-w-2xl mx-auto bg-red-50 border border-red-200 text-red-600 px-6 py-4 rounded-xl text-center mb-8 shadow-sm" role="alert">
+                <p className="font-semibold">{uiState.error}</p>
+            </div>
+          )}
           
-          {appData.recipe ? (
-            <RecipeDisplay 
-                recipe={appData.recipe}
-                chatHistory={appData.chatHistory}
-                onSendMessage={handleSendChatMessage}
-                isAwaitingResponse={uiState.isUpdatingRecipe}
-                isRateLimited={isRateLimited}
-                cooldownMessage={cooldownMessage}
-            />
-          ) : !uiState.isLoading && !appData.imagePreviewUrl && !appData.dishDescription.trim() && (
-            <WelcomeMessage />
+          {appData.recipe && (
+             <div className="relative">
+                 <button 
+                    onClick={handleFullClear}
+                    className="absolute -top-12 left-0 text-slate-500 hover:text-slate-800 flex items-center gap-2 text-sm font-medium transition-colors"
+                 >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                    </svg>
+                    Back to Search
+                 </button>
+                <RecipeDisplay 
+                    recipe={appData.recipe}
+                    chatHistory={appData.chatHistory}
+                    onSendMessage={handleSendChatMessage}
+                    isAwaitingResponse={uiState.isUpdatingRecipe}
+                    isRateLimited={isRateLimited}
+                    cooldownMessage={cooldownMessage}
+                />
+            </div>
           )}
         </div>
       </main>
+      <footer className="py-6 text-center text-slate-400 text-sm">
+        <p>&copy; {new Date().getFullYear()} Kasalo Kusina &bull; Powered by Google Gemini</p>
+      </footer>
     </div>
   );
 };

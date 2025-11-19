@@ -9,7 +9,11 @@ interface AppDataState {
   chatHistory: ChatMessage[];
 }
 
-export const useAppData = () => {
+interface UseAppDataProps {
+  onClear: () => void;
+}
+
+export const useAppData = ({ onClear }: UseAppDataProps) => {
   const [appData, setAppData] = useState<AppDataState>({
     imageFile: null,
     imagePreviewUrl: null,
@@ -17,14 +21,6 @@ export const useAppData = () => {
     recipe: null,
     chatHistory: [],
   });
-
-  const resetRecipeAndChat = () => {
-    setAppData(prev => ({
-      ...prev,
-      recipe: null,
-      chatHistory: [],
-    }));
-  };
 
   const handleImageSelect = useCallback((file: File | null) => {
     if (appData.imagePreviewUrl) {
@@ -34,16 +30,18 @@ export const useAppData = () => {
       ...prev,
       imageFile: file,
       imagePreviewUrl: file ? URL.createObjectURL(file) : null,
+      recipe: null,
+      chatHistory: [],
     }));
-    resetRecipeAndChat();
   }, [appData.imagePreviewUrl]);
 
   const handleDescriptionChange = useCallback((description: string) => {
     setAppData(prev => ({
         ...prev,
         dishDescription: description,
+        recipe: null,
+        chatHistory: [],
       }));
-    resetRecipeAndChat();
   }, []);
 
   const handleClear = useCallback(() => {
@@ -57,7 +55,8 @@ export const useAppData = () => {
       recipe: null,
       chatHistory: [],
     });
-  }, [appData.imagePreviewUrl]);
+    onClear();
+  }, [appData.imagePreviewUrl, onClear]);
 
   const setRecipe = (recipe: Recipe | null) => {
     setAppData(prev => ({ ...prev, recipe }));
@@ -71,6 +70,19 @@ export const useAppData = () => {
     setAppData(prev => ({...prev, chatHistory: []}));
   };
 
+  const clearAppData = () => {
+    if (appData.imagePreviewUrl) {
+        URL.revokeObjectURL(appData.imagePreviewUrl);
+    }
+    setAppData({
+        imageFile: null,
+        imagePreviewUrl: null,
+        dishDescription: '',
+        recipe: null,
+        chatHistory: [],
+    });
+  };
+
   return {
     appData,
     handleImageSelect,
@@ -79,5 +91,6 @@ export const useAppData = () => {
     setRecipe,
     addMessageToHistory,
     clearChatHistory,
+    clearAppData
   };
 };
