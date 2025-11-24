@@ -84,6 +84,16 @@ const App: React.FC = () => {
     handleClear();
   };
 
+  const handleLogoClick = () => {
+    if (authState.isAuthenticated) {
+        // If authenticated, just refresh the session (clear current view)
+        handleFullClear();
+    } else {
+        // If not authenticated, go to login
+        showAuthPage('login');
+    }
+  };
+
   const handleAnalyzeClick = async () => {
     if (!appData.imageFile && !appData.dishDescription.trim()) return;
     
@@ -168,12 +178,14 @@ const App: React.FC = () => {
         onRegisteredLogin={handleRegisteredLogin} 
         onGuestLogin={handleGuestLogin} 
         onNavigateToRegister={() => showAuthPage('register')} 
+        onLogoClick={() => showAuthPage('login')}
       />;
     }
     return <RegisterPage 
       onNavigateToLogin={() => showAuthPage('login')} 
       onGuestLogin={handleGuestLogin} 
       onRegisterSuccess={handleRegisteredLogin} 
+      onLogoClick={() => showAuthPage('login')}
     />;
   }
 
@@ -184,6 +196,7 @@ const App: React.FC = () => {
         onLogout={() => navigateAndClear('login')}
         onNavigateToLogin={() => navigateAndClear('login')}
         onNavigateToRegister={() => navigateAndClear('register')}
+        onLogoClick={handleLogoClick}
       />
       <main className="flex-grow container mx-auto px-4 py-12 max-w-6xl">
         
@@ -242,7 +255,7 @@ const App: React.FC = () => {
              <div className="flex flex-col items-center justify-center py-24 animate-pulse">
                 <div className="w-16 h-16 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-6"></div>
                 <p className="text-xl font-medium text-slate-600">The chef is identifying your dish...</p>
-                <p className="text-slate-400 text-sm mt-2">Using Gemini 3.0 Reasoning</p>
+                <p className="text-slate-400 text-sm mt-2">Using Gemini 2.5 Flash Lite Reasoning</p>
             </div>
           )}
 

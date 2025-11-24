@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Recipe, ChatMessage } from '../types';
-import { LoadingSpinner } from './LoadingSpinner';
 
 interface RecipeDisplayProps {
   recipe: Recipe | null;
@@ -180,7 +179,7 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({ recipe, chatHistor
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
-                        <p>Start a conversation with the chef about this recipe.</p>
+                        <p>Start a conversation with Chef Maria about this recipe.</p>
                     </div>
                 )}
                 {chatHistory.map((msg, index) => (

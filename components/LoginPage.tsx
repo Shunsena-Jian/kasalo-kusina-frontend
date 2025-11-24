@@ -19,9 +19,10 @@ interface LoginPageProps {
   onRegisteredLogin: () => void;
   onGuestLogin: () => void;
   onNavigateToRegister: () => void;
+  onLogoClick: () => void;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onRegisteredLogin, onGuestLogin, onNavigateToRegister }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onRegisteredLogin, onGuestLogin, onNavigateToRegister, onLogoClick }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -40,14 +41,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onRegisteredLogin, onGuest
 
   return (
     <AuthLayout
-      navButtonText="Register"
+      navButtonText="Create Account"
       onNavButtonClick={onNavigateToRegister}
+      onLogoClick={onLogoClick}
     >
         <div className="text-center">
-            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-            Kasalo Kusina
+            <h1 className="text-3xl font-extrabold text-slate-800">
+            Welcome Back
             </h1>
-            <p className="text-slate-600 mt-2">Sign in to discover recipes</p>
+            <p className="text-slate-500 mt-2">Sign in to discover your next meal</p>
         </div>
         
         <form onSubmit={handleLoginAttempt} className="space-y-6">
@@ -63,7 +65,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onRegisteredLogin, onGuest
             required
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="mt-1 block w-full px-4 py-3 bg-white/80 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            className="mt-1 block w-full px-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
             placeholder="your_username"
             />
         </div>
@@ -80,14 +82,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onRegisteredLogin, onGuest
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 block w-full px-4 py-3 pr-10 bg-white/80 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            className="mt-1 block w-full px-4 py-3 pr-10 bg-white border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
             placeholder="your_password"
             />
             {password && (
               <button
                   type="button"
                   onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                  className="absolute inset-y-0 right-0 top-6 pr-3 flex items-center text-slate-500 hover:text-slate-700"
+                  className="absolute inset-y-0 right-0 top-6 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
                   aria-label={isPasswordVisible ? "Hide password" : "Show password"}
               >
                   {isPasswordVisible ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
@@ -95,23 +97,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onRegisteredLogin, onGuest
             )}
         </div>
         
-        {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+        {error && <p className="text-sm text-red-600 text-center font-medium bg-red-50 py-2 rounded-lg">{error}</p>}
 
         <div>
             <button
             type="submit"
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-white font-bold bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-300"
+            className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-white font-bold bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-300 transform hover:-translate-y-0.5"
             >
             Sign In
             </button>
         </div>
         </form>
 
-        <div className="text-center">
+        <div className="text-center pt-2">
             <button
                 onClick={onGuestLogin}
                 type="button"
-                className="text-sm font-semibold text-sky-600 hover:text-sky-500 transition-colors"
+                className="text-sm font-semibold text-slate-500 hover:text-orange-600 transition-colors"
             >
                 Or continue as a guest
             </button>

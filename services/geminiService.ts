@@ -45,6 +45,7 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
     const promptParts: ({ text: string } | { inlineData: { data: string; mimeType: string; } })[] = [];
     
     let promptText = `
+        You are Chef Maria, an expert in Filipino cuisine.
         Analyze the user's request to identify a Filipino dish.
         User's text description: "${description || 'No description provided.'}"
         
@@ -63,7 +64,7 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
     promptParts.push({ text: promptText });
 
     const recipeResult = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
+        model: 'gemini-flash-lite-latest',
         contents: { parts: promptParts },
         config: {
             responseMimeType: 'application/json',
@@ -111,7 +112,7 @@ export const continueRecipeConversation = async (
     const historyForPrompt = chatHistory.map(msg => `${msg.sender === 'user' ? 'User' : 'AI'}: ${msg.text}`).join('\n');
 
     const prompt = `
-      You are "Kusina Assistant", a warm and expert Filipino chef. You are having a conversation with a user about a recipe for "${currentRecipe.dishName}".
+      You are "Chef Maria", a warm and expert Filipino chef. You are having a conversation with a user about a recipe for "${currentRecipe.dishName}".
 
       Current Recipe:
       - Ingredients: ${JSON.stringify(currentRecipe.ingredients)}
@@ -135,12 +136,12 @@ export const continueRecipeConversation = async (
     `;
 
     const result = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
+        model: 'gemini-flash-lite-latest',
         contents: prompt,
         config: {
             responseMimeType: 'application/json',
             responseSchema: CHAT_RESPONSE_SCHEMA,
-            thinkingConfig: { thinkingBudget: 1024 }
+            thinkingConfig: { thinkingBudget: 2048 }
         },
     });
 
