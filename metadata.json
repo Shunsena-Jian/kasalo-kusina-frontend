@@ -1,7 +1,5 @@
 {
-  "name": "Kasalo Kusina",
-  "description": "Discover Filipino recipes from a photo. Snap or upload a picture of a dish, and our AI will identify it and provide you with the name, ingredients, and cooking instructions.",
-  "requestFramePermissions": [
-    "camera"
-  ]
+    "name": "Kasalo Kusina",
+    "description": "Discover Filipino recipes from a photo. Snap or upload a picture of a dish, and our AI will identify it and provide you with the name, ingredients, and cooking instructions.",
+    "requestFramePermissions": ["camera"]
 }

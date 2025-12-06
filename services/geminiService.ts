@@ -1,15 +1,15 @@
-import { GoogleGenAI, Type, Modality } from "@google/genai";
-import type { Recipe, ChatMessage } from "../types";
+import { GoogleGenAI, Type, Modality } from '@google/genai';
+import type { Recipe, ChatMessage } from '../types';
 
 const fileToGenerativePart = async (file: File) => {
-  const base64EncodedDataPromise = new Promise<string>((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
-    reader.readAsDataURL(file);
-  });
-  return {
-    inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
-  };
+    const base64EncodedDataPromise = new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+        reader.readAsDataURL(file);
+    });
+    return {
+        inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
+    };
 };
 
 const RECIPE_SCHEMA = {
@@ -36,15 +36,16 @@ const RECIPE_SCHEMA = {
             description: 'The step-by-step cooking directions.',
         },
     },
-    required: ["dishName", "ingredients", "directions"],
+    required: ['dishName', 'ingredients', 'directions'],
 };
 
 export const analyzeDish = async (imageFile: File | null, description: string): Promise<Recipe> => {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
     // Fix: The prompt parts for a multipart request should be an array of Part objects (e.g. {text: string} or {inlineData: ...}), not a mix of objects and strings.
-    const promptParts: ({ text: string } | { inlineData: { data: string; mimeType: string; } })[] = [];
-    
+    const promptParts: ({ text: string } | { inlineData: { data: string; mimeType: string } })[] =
+        [];
+
     let promptText = `
         Analyze the user's request to identify a Filipino dish.
         User's text description: "${description || 'No description provided.'}"
@@ -60,7 +61,7 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
         const imagePart = await fileToGenerativePart(imageFile);
         promptParts.push(imagePart);
     }
-    
+
     promptParts.push({ text: promptText });
 
     const recipeResult = await ai.models.generateContent({
@@ -83,7 +84,11 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
     const imageResponse = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
         contents: {
-            parts: [{ text: `A delicious-looking, professionally photographed plate of Filipino ${recipeData.dishName}` }],
+            parts: [
+                {
+                    text: `A delicious-looking, professionally photographed plate of Filipino ${recipeData.dishName}`,
+                },
+            ],
         },
         config: {
             responseModalities: [Modality.IMAGE],
@@ -91,7 +96,7 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
     });
 
     let imageUrl: string | undefined = imageFile ? URL.createObjectURL(imageFile) : undefined;
-    
+
     if (!imageFile) {
         for (const part of imageResponse.candidates[0].content.parts) {
             if (part.inlineData) {
@@ -108,24 +113,26 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
 const CHAT_RESPONSE_SCHEMA = {
     type: Type.OBJECT,
     properties: {
-      responseText: {
-        type: Type.STRING,
-        description: "A conversational, helpful response to the user's message."
-      },
-      recipeUpdated: {
-        type: Type.BOOLEAN,
-        description: "Set to true only if the user's request resulted in a change to the recipe's ingredients or directions."
-      },
-      updatedRecipe: {
-        type: Type.OBJECT,
-        description: "The complete, updated recipe object. Provide this field ONLY if recipeUpdated is true.",
-        properties: RECIPE_SCHEMA.properties,
-        required: RECIPE_SCHEMA.required,
-      }
+        responseText: {
+            type: Type.STRING,
+            description: "A conversational, helpful response to the user's message.",
+        },
+        recipeUpdated: {
+            type: Type.BOOLEAN,
+            description:
+                "Set to true only if the user's request resulted in a change to the recipe's ingredients or directions.",
+        },
+        updatedRecipe: {
+            type: Type.OBJECT,
+            description:
+                'The complete, updated recipe object. Provide this field ONLY if recipeUpdated is true.',
+            properties: RECIPE_SCHEMA.properties,
+            required: RECIPE_SCHEMA.required,
+        },
     },
-    required: ["responseText", "recipeUpdated"]
-  };
-  
+    required: ['responseText', 'recipeUpdated'],
+};
+
 export const continueRecipeConversation = async (
     currentRecipe: Recipe,
     chatHistory: ChatMessage[],
@@ -133,7 +140,9 @@ export const continueRecipeConversation = async (
 ): Promise<{ responseText: string; updatedRecipe: Recipe | null }> => {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
-    const historyForPrompt = chatHistory.map(msg => `${msg.sender === 'user' ? 'User' : 'AI'}: ${msg.text}`).join('\n');
+    const historyForPrompt = chatHistory
+        .map((msg) => `${msg.sender === 'user' ? 'User' : 'AI'}: ${msg.text}`)
+        .join('\n');
 
     const prompt = `
       You are "Kusina Assistant", an expert Filipino chef AI. You are having a conversation with a user about a recipe for "${currentRecipe.dishName}".
@@ -171,9 +180,10 @@ export const continueRecipeConversation = async (
     const responseText = result.text.trim();
     const responseData = JSON.parse(responseText);
 
-    const updatedRecipe = responseData.recipeUpdated && responseData.updatedRecipe 
-        ? { ...responseData.updatedRecipe, imageUrl: currentRecipe.imageUrl }
-        : null;
+    const updatedRecipe =
+        responseData.recipeUpdated && responseData.updatedRecipe
+            ? { ...responseData.updatedRecipe, imageUrl: currentRecipe.imageUrl }
+            : null;
 
     return {
         responseText: responseData.responseText,
