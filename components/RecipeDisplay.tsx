@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Recipe, ChatMessage } from '../types';
 import { LoadingSpinner } from './LoadingSpinner';
+import { motion } from 'framer-motion';
 
 interface RecipeDisplayProps {
     recipe: Recipe | null;
@@ -11,7 +12,7 @@ interface RecipeDisplayProps {
 
 const UserMessage: React.FC<{ text: string }> = ({ text }) => (
     <div className="flex justify-end">
-        <div className="bg-blue-500 text-white rounded-lg rounded-br-none py-2 px-4 max-w-sm">
+        <div className="bg-gradient-to-r from-primary to-secondary text-white rounded-2xl rounded-tr-none py-3 px-5 max-w-sm shadow-md font-medium">
             {text}
         </div>
     </div>
@@ -51,23 +52,28 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
     };
 
     return (
-        <div className="bg-white/70 backdrop-blur-2xl rounded-2xl shadow-2xl p-6 md:p-8 animate-fade-in border border-black/5">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="glass rounded-3xl shadow-2xl p-6 md:p-8 border border-white/40"
+        >
             {recipe.imageUrl && (
                 <div className="mb-6">
                     <img
                         src={recipe.imageUrl}
                         alt={recipe.dishName}
-                        className="w-full h-auto max-h-[400px] object-contain rounded-lg shadow-md mx-auto"
+                        className="w-full h-auto max-h-[400px] object-contain rounded-2xl shadow-md mx-auto"
                     />
                 </div>
             )}
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-indigo-700 mb-6 pb-4 border-b border-slate-200">
+            <h2 className="text-3xl md:text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-8 pb-4 border-b border-black/5">
                 {recipe.dishName}
             </h2>
 
             <div className="grid md:grid-cols-5 gap-8">
                 <div className="md:col-span-2">
-                    <h3 className="text-2xl font-semibold text-blue-600 mb-4 flex items-center gap-2">
+                    <h3 className="text-2xl font-bold text-secondary mb-4 flex items-center gap-2">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-6 w-6"
@@ -92,7 +98,7 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                 </div>
 
                 <div className="md:col-span-3">
-                    <h3 className="text-2xl font-semibold text-blue-600 mb-4 flex items-center gap-2">
+                    <h3 className="text-2xl font-bold text-secondary mb-4 flex items-center gap-2">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-6 w-6"
@@ -124,7 +130,7 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                 <h3 className="text-xl font-semibold text-center text-slate-700 mb-4">
                     Chat with your Kusina Assistant
                 </h3>
-                <div className="bg-white/50 border border-slate-200 rounded-lg p-4 h-64 overflow-y-auto space-y-4">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 h-64 overflow-y-auto space-y-4 shadow-inner">
                     {chatHistory.map((msg, index) =>
                         msg.sender === 'user' ? (
                             <UserMessage key={index} text={msg.text} />
@@ -149,13 +155,13 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                         onChange={(e) => setUserMessage(e.target.value)}
                         placeholder="e.g., 'Can I make this vegetarian?'"
                         disabled={isAwaitingResponse}
-                        className="flex-grow w-full px-4 py-2 bg-white/80 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-colors disabled:bg-slate-100"
+                        className="flex-grow w-full px-5 py-3 bg-white border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors disabled:bg-slate-100"
                         aria-label="Chat with AI assistant"
                     />
                     <button
                         type="submit"
                         disabled={isAwaitingResponse || !userMessage.trim()}
-                        className="flex items-center justify-center gap-2 px-6 py-2 bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold rounded-lg shadow-md hover:from-sky-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-slate-100 transition-all duration-300 disabled:bg-slate-200 disabled:from-transparent disabled:to-transparent disabled:text-slate-500 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl shadow-md hover:opacity-90 transition-all duration-300 disabled:bg-slate-200 disabled:from-transparent disabled:to-transparent disabled:text-slate-500 disabled:cursor-not-allowed"
                     >
                         Send
                         <svg
@@ -169,16 +175,6 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                     </button>
                 </form>
             </div>
-
-            <style>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out forwards;
-        }
-      `}</style>
-        </div>
+        </motion.div>
     );
 };

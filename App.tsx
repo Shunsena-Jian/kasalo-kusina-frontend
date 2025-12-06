@@ -12,6 +12,8 @@ import { useUIState } from './hooks/useUIState';
 import { authService } from './services/authService';
 import type { Recipe } from './types';
 
+import { PageTransition } from './components/PageTransition';
+
 const App: React.FC = () => {
     const { authState, handleRegisteredLogin, handleGuestLogin, showAuthPage } = useAuthState();
     const { uiState, setLoading, setError, setUpdatingRecipe, clearUI, setImageFeaturesDisabled } =
@@ -119,9 +121,9 @@ const App: React.FC = () => {
     };
 
     const WelcomeMessage: React.FC = () => (
-        <div className="text-center p-8 bg-white/50 backdrop-blur-xl rounded-2xl border border-black/5 shadow-lg">
-            <h2 className="text-2xl font-bold text-indigo-600 mb-2">Welcome to Kasalo Kusina!</h2>
-            <p className="text-slate-600">
+        <div className="text-center p-8 glass rounded-3xl border border-white/40 shadow-lg">
+            <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-3">Welcome to Kasalo Kusina!</h2>
+            <p className="text-slate-600 text-lg font-medium">
                 Ready to discover a recipe? Upload a photo, describe a Filipino dish, or do both to
                 get started.
             </p>
@@ -148,62 +150,71 @@ const App: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen relative overflow-hidden">
+            {/* Background Blob Animation */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 bg-gradient-to-br from-light to-white">
+                <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/30 rounded-full blur-3xl animate-blob"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-secondary/30 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+                <div className="absolute top-[40%] left-[40%] w-96 h-96 bg-accent/30 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+            </div>
             <Header
                 userType={authState.userType}
                 onLogout={handleLogout}
                 onNavigateToLogin={() => navigateAndClear('login')}
                 onNavigateToRegister={() => navigateAndClear('register')}
+                onLogoClick={handleFullClear}
             />
-            <main className="container mx-auto px-4 py-8 max-w-4xl">
-                <div className="bg-white/60 backdrop-blur-xl rounded-2xl shadow-lg p-6 md:p-8 space-y-6 border border-black/5">
-                    <DishInput
-                        onImageSelect={handleImageSelect}
-                        onDescriptionChange={handleDescriptionChange}
-                        onClear={handleFullClear}
-                        imagePreviewUrl={appData.imagePreviewUrl}
-                        description={appData.dishDescription}
-                        isLoading={uiState.isLoading}
-                        isGuest={isGuest}
-                        onNavigateToRegister={() => navigateAndClear('register')}
-                        imageFeaturesDisabled={uiState.imageFeaturesDisabled}
-                    />
+            <main className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
+                <PageTransition>
+                    <div className="glass rounded-3xl shadow-2xl p-6 md:p-8 space-y-6 border border-white/40">
+                        <DishInput
+                            onImageSelect={handleImageSelect}
+                            onDescriptionChange={handleDescriptionChange}
+                            onClear={handleFullClear}
+                            imagePreviewUrl={appData.imagePreviewUrl}
+                            description={appData.dishDescription}
+                            isLoading={uiState.isLoading}
+                            isGuest={isGuest}
+                            onNavigateToRegister={() => navigateAndClear('register')}
+                            imageFeaturesDisabled={uiState.imageFeaturesDisabled}
+                        />
 
-                    {(appData.imagePreviewUrl || appData.dishDescription.trim()) && !isGuest && (
-                        <div className="flex flex-col items-center">
-                            <button
-                                onClick={handleAnalyzeClick}
-                                disabled={uiState.isLoading}
-                                className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold rounded-lg shadow-lg hover:from-sky-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-100 transition-all duration-300 disabled:bg-slate-200 disabled:from-transparent disabled:to-transparent disabled:text-slate-500 disabled:cursor-not-allowed"
-                            >
-                                {uiState.isLoading ? (
-                                    <>
-                                        <LoadingSpinner />
-                                        Analyzing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-6 w-6"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                                            />
-                                        </svg>
-                                        Find my dish!
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    )}
-                </div>
+                        {(appData.imagePreviewUrl || appData.dishDescription.trim()) && !isGuest && (
+                            <div className="flex flex-col items-center">
+                                <button
+                                    onClick={handleAnalyzeClick}
+                                    disabled={uiState.isLoading}
+                                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold rounded-lg shadow-lg hover:from-sky-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-100 transition-all duration-300 disabled:bg-slate-200 disabled:from-transparent disabled:to-transparent disabled:text-slate-500 disabled:cursor-not-allowed"
+                                >
+                                    {uiState.isLoading ? (
+                                        <>
+                                            <LoadingSpinner />
+                                            Analyzing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-6 w-6"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                                                />
+                                            </svg>
+                                            Find my dish!
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </PageTransition>
 
                 <div className="mt-8">
                     {uiState.isLoading && (
@@ -233,7 +244,11 @@ const App: React.FC = () => {
                     ) : (
                         !uiState.isLoading &&
                         !appData.imagePreviewUrl &&
-                        !appData.dishDescription.trim() && <WelcomeMessage />
+                        !appData.dishDescription.trim() && (
+                            <PageTransition>
+                                <WelcomeMessage />
+                            </PageTransition>
+                        )
                     )}
                 </div>
             </main>

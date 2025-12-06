@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { AuthLayout } from './AuthLayout';
 import { ApiError } from '../services/api';
@@ -7,7 +8,7 @@ const EyeIcon: React.FC<{ className?: string }> = ({ className }) => (
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        strokeWidth={1.5}
+        strokeWidth={2}
         stroke="currentColor"
         className={className || 'w-6 h-6'}
     >
@@ -25,7 +26,7 @@ const EyeOffIcon: React.FC<{ className?: string }> = ({ className }) => (
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        strokeWidth={1.5}
+        strokeWidth={2}
         stroke="currentColor"
         className={className || 'w-6 h-6'}
     >
@@ -93,18 +94,54 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
         }
     };
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1
+        }
+    };
+
     return (
-        <AuthLayout navButtonText="Sign In" onNavButtonClick={onNavigateToLogin}>
-            <div className="text-center">
-                <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+        <AuthLayout navButtonText="Sign In" onNavButtonClick={onNavigateToLogin} onLogoClick={onNavigateToLogin}>
+            <div className="text-center mb-6">
+                <motion.h1
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                    className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+                >
                     Create Account
-                </h1>
-                <p className="text-slate-600 mt-2">Join Kasalo Kusina today</p>
+                </motion.h1>
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-slate-600 mt-2 font-medium"
+                >
+                    Join Kasalo Kusina today
+                </motion.p>
             </div>
 
-            <form onSubmit={handleRegisterAttempt} className="space-y-4">
-                <div>
-                    <label htmlFor="username" className="block text-sm font-medium text-slate-700">
+            <motion.form
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                onSubmit={handleRegisterAttempt}
+                className="space-y-5"
+            >
+                <motion.div variants={itemVariants}>
+                    <label htmlFor="username" className="block text-sm font-bold text-dark mb-1 ml-1">
                         Username
                     </label>
                     <input
@@ -114,16 +151,16 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                         required
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="mt-1 block w-full px-4 py-3 bg-white/80 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                        className="block w-full px-5 py-3 bg-slate-50 border-2 border-slate-200 focus:border-primary/50 text-dark rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all font-medium placeholder-slate-400"
                         placeholder="Username"
                     />
                     {fieldErrors.username && (
-                        <p className="mt-1 text-sm text-red-600">{fieldErrors.username}</p>
+                        <p className="mt-1 ml-1 text-sm text-primary font-semibold">{fieldErrors.username}</p>
                     )}
-                </div>
+                </motion.div>
 
-                <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+                <motion.div variants={itemVariants}>
+                    <label htmlFor="email" className="block text-sm font-bold text-dark mb-1 ml-1">
                         Email
                     </label>
                     <input
@@ -133,16 +170,16 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="mt-1 block w-full px-4 py-3 bg-white/80 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                        className="block w-full px-5 py-3 bg-slate-50 border-2 border-slate-200 focus:border-primary/50 text-dark rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all font-medium placeholder-slate-400"
                         placeholder="email@sample.com"
                     />
                     {fieldErrors.email && (
-                        <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+                        <p className="mt-1 ml-1 text-sm text-primary font-semibold">{fieldErrors.email}</p>
                     )}
-                </div>
+                </motion.div>
 
-                <div className="relative">
-                    <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+                <motion.div variants={itemVariants} className="relative">
+                    <label htmlFor="password" className="block text-sm font-bold text-dark mb-1 ml-1">
                         Password
                     </label>
                     <input
@@ -152,14 +189,14 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="mt-1 block w-full px-4 py-3 pr-10 bg-white/80 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                        className="block w-full px-5 py-3 pr-10 bg-slate-50 border-2 border-slate-200 focus:border-primary/50 text-dark rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all font-medium placeholder-slate-400"
                         placeholder="Password"
                     />
                     {password && (
                         <button
                             type="button"
                             onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                            className="absolute inset-y-0 right-0 top-6 pr-3 flex items-center text-slate-500 hover:text-slate-700"
+                            className="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-slate-500 hover:text-primary transition-colors"
                             aria-label={isPasswordVisible ? 'Hide password' : 'Show password'}
                         >
                             {isPasswordVisible ? (
@@ -170,14 +207,14 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                         </button>
                     )}
                     {fieldErrors.password && (
-                        <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
+                        <p className="mt-1 ml-1 text-sm text-primary font-semibold">{fieldErrors.password}</p>
                     )}
-                </div>
+                </motion.div>
 
-                <div className="relative">
+                <motion.div variants={itemVariants} className="relative">
                     <label
                         htmlFor="confirm_password"
-                        className="block text-sm font-medium text-slate-700"
+                        className="block text-sm font-bold text-dark mb-1 ml-1"
                     >
                         Confirm Password
                     </label>
@@ -188,14 +225,14 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                         required
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="mt-1 block w-full px-4 py-3 pr-10 bg-white/80 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                        className="block w-full px-5 py-3 pr-10 bg-slate-50 border-2 border-slate-200 focus:border-primary/50 text-dark rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all font-medium placeholder-slate-400"
                         placeholder="Confirm Password"
                     />
                     {confirmPassword && (
                         <button
                             type="button"
                             onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
-                            className="absolute inset-y-0 right-0 top-6 pr-3 flex items-center text-slate-500 hover:text-slate-700"
+                            className="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-slate-500 hover:text-primary transition-colors"
                             aria-label={
                                 isConfirmPasswordVisible ? 'Hide password' : 'Show password'
                             }
@@ -208,31 +245,44 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                         </button>
                     )}
                     {fieldErrors.confirmPassword && (
-                        <p className="mt-1 text-sm text-red-600">{fieldErrors.confirmPassword}</p>
+                        <p className="mt-1 ml-1 text-sm text-primary font-semibold">{fieldErrors.confirmPassword}</p>
                     )}
-                </div>
+                </motion.div>
 
-                {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+                {error && (
+                    <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-sm text-primary font-bold text-center bg-primary/10 py-2 rounded-lg"
+                    >
+                        {error}
+                    </motion.p>
+                )}
 
-                <div>
+                <motion.div variants={itemVariants}>
                     <button
                         type="submit"
-                        className="w-full flex justify-center py-3 px-4 mt-2 border border-transparent rounded-lg shadow-lg text-white font-bold bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all duration-300"
+                        className="w-full flex justify-center py-4 px-4 mt-2 border border-transparent rounded-xl shadow-lg text-white font-bold text-lg bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                     >
                         Register
                     </button>
-                </div>
-            </form>
+                </motion.div>
+            </motion.form>
 
-            <div className="text-center">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-center mt-6"
+            >
                 <button
                     onClick={onGuestLogin}
                     type="button"
-                    className="text-sm font-semibold text-sky-600 hover:text-sky-500 transition-colors"
+                    className="text-sm font-bold text-secondary hover:text-primary transition-colors underline decoration-2 decoration-transparent hover:decoration-current underline-offset-4"
                 >
                     Or continue as a guest
                 </button>
-            </div>
+            </motion.div>
         </AuthLayout>
     );
 };

@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { motion } from 'framer-motion';
 
 interface DishInputProps {
     onImageSelect: (file: File | null) => void;
@@ -170,7 +171,7 @@ export const DishInput: React.FC<DishInputProps> = ({
                     value={description}
                     onChange={(e) => onDescriptionChange(e.target.value)}
                     placeholder="e.g., 'a sour and savory soup with pork and tamarind', 'chicken adobo', or upload a photo..."
-                    className="w-full h-32 p-3 bg-white/80 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-colors disabled:bg-slate-100"
+                    className="w-full h-32 p-3 bg-slate-50 border border-slate-200 rounded-xl shadow-inner placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors disabled:bg-slate-100"
                     aria-label="Describe the dish"
                     disabled={isLoading || isGuest}
                 />
@@ -206,22 +207,26 @@ export const DishInput: React.FC<DishInputProps> = ({
                     ref={cameraInputRef}
                 />
 
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading || isGuest || imageFeaturesDisabled}
-                    className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-300 text-slate-700 font-bold rounded-lg shadow-sm hover:bg-slate-50 transition-colors disabled:bg-slate-100 disabled:cursor-not-allowed"
+                    className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:border-primary hover:text-primary transition-all disabled:bg-slate-100 disabled:cursor-not-allowed"
                 >
                     <UploadIcon />
                     Upload Photo
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => cameraInputRef.current?.click()}
                     disabled={isLoading || isGuest || imageFeaturesDisabled}
-                    className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-300 text-slate-700 font-bold rounded-lg shadow-sm hover:bg-slate-50 transition-colors disabled:bg-slate-100 disabled:cursor-not-allowed"
+                    className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:border-primary hover:text-primary transition-all disabled:bg-slate-100 disabled:cursor-not-allowed"
                 >
                     <CameraIcon />
                     Use Camera
-                </button>
+                </motion.button>
             </div>
         </div>
     );
