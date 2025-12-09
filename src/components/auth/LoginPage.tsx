@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { AuthLayout } from './AuthLayout';
-import { authService } from '../services/authService';
+import { authService } from '@/services/authService.ts';
 
 const EyeIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg

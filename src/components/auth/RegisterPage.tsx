@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { AuthLayout } from './AuthLayout';
-import { ApiError } from '../services/api';
+import { ApiError } from '@/services/api.ts';
 
 const EyeIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg
@@ -72,7 +72,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
             return;
         }
         try {
-            await import('../services/authService').then(m => m.authService.register(username, email, password));
+            await import('../../services/authService').then(m => m.authService.register(username, email, password));
             onRegisterSuccess();
         } catch (err: any) {
             console.error(err);

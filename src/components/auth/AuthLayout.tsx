@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageTransition } from './PageTransition';
+import { PageTransition } from '../common/PageTransition';
 
 interface AuthLayoutProps {
     children: React.ReactNode;

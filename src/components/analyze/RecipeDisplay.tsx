@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { Recipe, ChatMessage } from '../types';
-import { LoadingSpinner } from './LoadingSpinner';
+import type { Recipe, ChatMessage } from '@/types.ts';
+import { LoadingSpinner } from '../common/LoadingSpinner';
 import { motion } from 'framer-motion';
 
 interface RecipeDisplayProps {
