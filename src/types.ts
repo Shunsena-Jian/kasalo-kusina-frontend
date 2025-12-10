@@ -14,7 +14,7 @@ export interface APIRecipe {
     user_name: string;
     title: string;
     description: string;
-    images: string[] | null;
+    image: string | null;
     prep_time_min: number;
     cook_time_min: number;
     difficulty: string;

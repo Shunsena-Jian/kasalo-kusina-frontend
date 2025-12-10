@@ -48,6 +48,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
         return `${total} min`;
     };
 
+    const getImageUrl = (imagePath: string | null) => {
+        if (!imagePath) return 'https://placehold.co/600x400?text=No+Image';
+        if (imagePath.startsWith('http')) return imagePath;
+
+        const apiUrl = import.meta.env.VITE_API_URL || '';
+        const baseUrl = apiUrl.replace(/\/api\/?$/, '');
+        return `${baseUrl}${imagePath}`;
+    };
+
     if (isLoading) {
         return (
             <div className="flex justify-center items-center min-h-[50vh]">
@@ -114,7 +123,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                         <div key={index} className="min-w-[85%] sm:min-w-[320px] snap-center">
                             <RecipeCard
                                 title={recipe.title}
-                                image={recipe.images && recipe.images.length > 0 ? recipe.images[0] : 'https://placehold.co/600x400?text=No+Image'}
+                                image={getImageUrl(recipe.image)}
                                 rating={recipe.average_rating}
                                 time={formatTime(recipe.prep_time_min, recipe.cook_time_min)}
                                 description={recipe.description}
@@ -133,7 +142,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                         <div key={index} className="min-w-[85%] sm:min-w-[320px] snap-center">
                             <RecipeCard
                                 title={recipe.title}
-                                image={recipe.images && recipe.images.length > 0 ? recipe.images[0] : 'https://placehold.co/600x400?text=No+Image'}
+                                image={getImageUrl(recipe.image)}
                                 rating={recipe.average_rating}
                                 time={formatTime(recipe.prep_time_min, recipe.cook_time_min)}
                                 description={recipe.description}
@@ -152,7 +161,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                         <div key={index} className="min-w-[85%] sm:min-w-[320px] snap-center">
                             <RecipeCard
                                 title={recipe.title}
-                                image={recipe.images && recipe.images.length > 0 ? recipe.images[0] : 'https://placehold.co/600x400?text=No+Image'}
+                                image={getImageUrl(recipe.image)}
                                 rating={recipe.average_rating}
                                 time={formatTime(recipe.prep_time_min, recipe.cook_time_min)}
                                 description={recipe.description}
