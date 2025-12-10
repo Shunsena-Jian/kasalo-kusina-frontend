@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { RecipeCard } from './RecipeCard';
+import { FadeScroll } from '../common/FadeScroll';
 import { recipeService } from '@/services/recipeService.ts';
 import { APIRecipe } from '@/types.ts';
 import { LoadingSpinner } from '../common/LoadingSpinner';
@@ -118,7 +119,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                         View All
                     </button>
                 </div>
-                <div className="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+                <FadeScroll className="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
                     {featuredRecipes.map((recipe, index) => (
                         <div key={index} className="min-w-[85%] sm:min-w-[320px] snap-center">
                             <RecipeCard
@@ -131,13 +132,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                             />
                         </div>
                     ))}
-                </div>
+                </FadeScroll>
             </section>
 
             {/* New Arrivals */}
             <section>
                 <h2 className="text-3xl font-bold text-slate-800 mb-6">Fresh from the Kitchen</h2>
-                <div className="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+                <FadeScroll className="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
                     {newRecipes.map((recipe, index) => (
                         <div key={index} className="min-w-[85%] sm:min-w-[320px] snap-center">
                             <RecipeCard
@@ -150,13 +151,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                             />
                         </div>
                     ))}
-                </div>
+                </FadeScroll>
             </section>
 
             {/* High Rated */}
             <section>
                 <h2 className="text-3xl font-bold text-slate-800 mb-6">Community Favorites</h2>
-                <div className="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+                <FadeScroll className="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
                     {highRatedRecipes.map((recipe, index) => (
                         <div key={index} className="min-w-[85%] sm:min-w-[320px] snap-center">
                             <RecipeCard
@@ -169,7 +170,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                             />
                         </div>
                     ))}
-                </div>
+                </FadeScroll>
             </section>
         </div>
     );
