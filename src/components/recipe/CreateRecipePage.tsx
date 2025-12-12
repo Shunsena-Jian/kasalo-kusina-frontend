@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Input } from '../common/Input';
 import { TextArea } from '../common/TextArea';
 import { Button } from '../common/Button';
+import { Select } from '../common/Select';
 import { recipeService } from '../../services/recipeService';
 import { Ingredient, Instruction } from '../../types';
 
@@ -204,16 +205,16 @@ export const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ onNavigateTo
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-1 ml-1">Difficulty</label>
-                        <select
-                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl shadow-inner placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors font-medium"
+                        <Select
+                            label="Difficulty"
                             value={difficulty}
-                            onChange={(e) => setDifficulty(e.target.value)}
-                        >
-                            <option value="easy">Easy</option>
-                            <option value="medium">Medium</option>
-                            <option value="hard">Hard</option>
-                        </select>
+                            onChange={(val) => setDifficulty(val)}
+                            options={[
+                                { label: 'Easy', value: 'easy' },
+                                { label: 'Medium', value: 'medium' },
+                                { label: 'Hard', value: 'hard' },
+                            ]}
+                        />
                     </div>
                 </motion.div>
 
