@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '../common/Button';
 
 interface RecipeCardProps {
     title: string;
@@ -41,9 +42,9 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
                     </div>
                 </div>
                 <p className="text-slate-600 text-sm line-clamp-2 mb-4 flex-grow">{description}</p>
-                <button className="w-full py-2 bg-slate-50 text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors text-sm">
+                <Button fullWidth className="text-sm">
                     View Recipe
-                </button>
+                </Button>
             </div>
         </div>
     );

@@ -26,3 +26,18 @@ export interface APIRecipe {
 export interface RecipeListResponse {
     data: APIRecipe[];
 }
+
+export interface Ingredient {
+    name: string;
+    quantity: string;
+    unit: string;
+}
+
+export interface Instruction {
+    step: number;
+    text: string;
+}
+
+export interface CreateRecipeResponse {
+    data: APIRecipe;
+}

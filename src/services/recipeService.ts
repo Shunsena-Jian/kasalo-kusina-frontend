@@ -12,5 +12,13 @@ export const recipeService = {
 
     async getHighRatedRecipes(): Promise<RecipeListResponse> {
         return apiFetch<RecipeListResponse>('/recipes/high-rated');
+    },
+
+    async createRecipe(formData: FormData): Promise<RecipeListResponse> { // Using RecipeListResponse format or specific response
+        return apiFetch<RecipeListResponse>('/recipes', {
+            method: 'POST',
+            body: formData,
+        });
+
     }
 };

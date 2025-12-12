@@ -4,6 +4,7 @@ import { HomePage } from './components/home/HomePage';
 import { AnalyzePage } from './components/analyze/AnalyzePage';
 import { LoginPage } from './components/auth/LoginPage';
 import { RegisterPage } from './components/auth/RegisterPage';
+import { CreateRecipePage } from './components/recipe/CreateRecipePage';
 import { analyzeDish, continueRecipeConversation } from './services/geminiService';
 import { useAuthState } from './hooks/useAuthState';
 import { useAppData } from './hooks/useAppData';
@@ -119,7 +120,7 @@ const App: React.FC = () => {
         }
     };
 
-    const [currentView, setCurrentView] = useState<'home' | 'analyze'>('home');
+    const [currentView, setCurrentView] = useState<'home' | 'analyze' | 'create-recipe'>('home');
 
     const handleNavigateToHome = () => {
         setCurrentView('home');
@@ -129,6 +130,10 @@ const App: React.FC = () => {
     const handleNavigateToAnalyze = () => {
         setCurrentView('analyze');
         // Don't clear here so users can go back to their analysis
+    };
+
+    const handleNavigateToCreateRecipe = () => {
+        setCurrentView('create-recipe');
     };
 
     const WelcomeMessage: React.FC = () => (
@@ -148,6 +153,8 @@ const App: React.FC = () => {
                     onRegisteredLogin={handleRegisteredLogin}
                     onGuestLogin={handleGuestLogin}
                     onNavigateToRegister={() => showAuthPage('register')}
+                    onNavigateToLogin={() => showAuthPage('login')}
+                    onNavigateToHome={handleNavigateToHome}
                 />
             );
         }
@@ -156,6 +163,8 @@ const App: React.FC = () => {
                 onNavigateToLogin={() => showAuthPage('login')}
                 onGuestLogin={handleGuestLogin}
                 onRegisterSuccess={handleRegisteredLogin}
+                onNavigateToRegister={() => showAuthPage('register')}
+                onNavigateToHome={handleNavigateToHome}
             />
         );
     }
@@ -175,14 +184,15 @@ const App: React.FC = () => {
                 onNavigateToRegister={() => navigateAndClear('register')}
                 onNavigateToHome={handleNavigateToHome}
                 onNavigateToAnalyze={handleNavigateToAnalyze}
+                onNavigateToCreateRecipe={handleNavigateToCreateRecipe}
                 onLogoClick={handleNavigateToHome}
                 currentView={currentView}
             />
-            <main className="container mx-auto px-4 py-8 max-w-4xl relative z-10 w-full">
+            <main className="container mx-auto px-4 pt-24 pb-8 max-w-4xl relative z-10 w-full">
                 <PageTransition key={currentView}>
                     {currentView === 'home' ? (
                         <HomePage onAnalyzeClick={handleNavigateToAnalyze} />
-                    ) : (
+                    ) : currentView === 'analyze' ? (
                         <AnalyzePage
                             appData={appData}
                             uiState={uiState}
@@ -194,6 +204,8 @@ const App: React.FC = () => {
                             onSendMessage={handleSendChatMessage}
                             onNavigateToRegister={() => navigateAndClear('register')}
                         />
+                    ) : (
+                        <CreateRecipePage onNavigateToHome={handleNavigateToHome} />
                     )}
                 </PageTransition>
             </main>

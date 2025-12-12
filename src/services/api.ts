@@ -15,14 +15,14 @@ export class ApiError extends Error {
 }
 
 export const apiFetch = async <T>(endpoint: string, options: FetchOptions = {}): Promise<T> => {
-    const token = localStorage.getItem('token');
+    const defaultHeaders: Record<string, string> = {};
 
-    const defaultHeaders: Record<string, string> = {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    };
+    if (!(options.body instanceof FormData)) {
+        defaultHeaders['Content-Type'] = 'application/json';
+    }
 
     const response = await fetch(`${API_URL}${endpoint}`, {
+        credentials: 'include',
         ...options,
         headers: {
             ...defaultHeaders,

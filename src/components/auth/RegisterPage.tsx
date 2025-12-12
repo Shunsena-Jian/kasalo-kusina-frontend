@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { AuthLayout } from './AuthLayout';
 import { ApiError } from '@/services/api.ts';
+import { Input } from '../common/Input';
+import { Button } from '../common/Button';
 
 const EyeIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg
@@ -42,12 +44,16 @@ interface RegisterPageProps {
     onNavigateToLogin: () => void;
     onGuestLogin: () => void;
     onRegisterSuccess: () => void;
+    onNavigateToRegister: () => void;
+    onNavigateToHome: () => void;
 }
 
 export const RegisterPage: React.FC<RegisterPageProps> = ({
     onNavigateToLogin,
     onGuestLogin,
     onRegisterSuccess,
+    onNavigateToRegister,
+    onNavigateToHome,
 }) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -113,7 +119,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
     };
 
     return (
-        <AuthLayout navButtonText="Sign In" onNavButtonClick={onNavigateToLogin} onLogoClick={onNavigateToLogin}>
+        <AuthLayout
+            onNavigateToLogin={onNavigateToLogin}
+            onNavigateToRegister={onNavigateToRegister}
+            onNavigateToHome={onNavigateToHome}
+            onLogoClick={onNavigateToHome}
+        >
             <div className="text-center mb-6">
                 <motion.h1
                     initial={{ scale: 0.5, opacity: 0 }}
@@ -141,62 +152,53 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                 className="space-y-5"
             >
                 <motion.div variants={itemVariants}>
-                    <label htmlFor="username" className="block text-sm font-bold text-dark mb-1 ml-1">
-                        Username
-                    </label>
-                    <input
+                    <Input
                         id="username"
                         name="username"
                         type="text"
                         required
+                        label="Username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="block w-full px-5 py-3 bg-slate-50 border-2 border-slate-200 focus:border-primary/50 text-dark rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all font-medium placeholder-slate-400"
                         placeholder="Username"
+                        className="px-5 py-3"
+                        error={fieldErrors.username}
                     />
-                    {fieldErrors.username && (
-                        <p className="mt-1 ml-1 text-sm text-primary font-semibold">{fieldErrors.username}</p>
-                    )}
                 </motion.div>
 
                 <motion.div variants={itemVariants}>
-                    <label htmlFor="email" className="block text-sm font-bold text-dark mb-1 ml-1">
-                        Email
-                    </label>
-                    <input
+                    <Input
                         id="email"
                         name="email"
                         type="email"
                         required
+                        label="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="block w-full px-5 py-3 bg-slate-50 border-2 border-slate-200 focus:border-primary/50 text-dark rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all font-medium placeholder-slate-400"
                         placeholder="email@sample.com"
+                        className="px-5 py-3"
+                        error={fieldErrors.email}
                     />
-                    {fieldErrors.email && (
-                        <p className="mt-1 ml-1 text-sm text-primary font-semibold">{fieldErrors.email}</p>
-                    )}
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="relative">
-                    <label htmlFor="password" className="block text-sm font-bold text-dark mb-1 ml-1">
-                        Password
-                    </label>
-                    <input
+                    <Input
                         id="password"
                         name="password"
                         type={isPasswordVisible ? 'text' : 'password'}
                         required
+                        label="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="block w-full px-5 py-3 pr-10 bg-slate-50 border-2 border-slate-200 focus:border-primary/50 text-dark rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all font-medium placeholder-slate-400"
                         placeholder="Password"
+                        className="px-5 py-3 pr-10"
+                        error={fieldErrors.password}
                     />
                     {password && (
                         <button
                             type="button"
                             onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                            className="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-slate-500 hover:text-primary transition-colors"
+                            className="absolute right-0 top-9 pr-3 flex items-center text-slate-500 hover:text-primary transition-colors"
                             aria-label={isPasswordVisible ? 'Hide password' : 'Show password'}
                         >
                             {isPasswordVisible ? (
@@ -206,33 +208,26 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                             )}
                         </button>
                     )}
-                    {fieldErrors.password && (
-                        <p className="mt-1 ml-1 text-sm text-primary font-semibold">{fieldErrors.password}</p>
-                    )}
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="relative">
-                    <label
-                        htmlFor="confirm_password"
-                        className="block text-sm font-bold text-dark mb-1 ml-1"
-                    >
-                        Confirm Password
-                    </label>
-                    <input
+                    <Input
                         id="confirm_password"
                         name="confirm_password"
                         type={isConfirmPasswordVisible ? 'text' : 'password'}
                         required
+                        label="Confirm Password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="block w-full px-5 py-3 pr-10 bg-slate-50 border-2 border-slate-200 focus:border-primary/50 text-dark rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all font-medium placeholder-slate-400"
                         placeholder="Confirm Password"
+                        className="px-5 py-3 pr-10"
+                        error={fieldErrors.confirmPassword}
                     />
                     {confirmPassword && (
                         <button
                             type="button"
                             onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
-                            className="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-slate-500 hover:text-primary transition-colors"
+                            className="absolute right-0 top-9 pr-3 flex items-center text-slate-500 hover:text-primary transition-colors"
                             aria-label={
                                 isConfirmPasswordVisible ? 'Hide password' : 'Show password'
                             }
@@ -244,10 +239,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                             )}
                         </button>
                     )}
-                    {fieldErrors.confirmPassword && (
-                        <p className="mt-1 ml-1 text-sm text-primary font-semibold">{fieldErrors.confirmPassword}</p>
-                    )}
                 </motion.div>
+
 
                 {error && (
                     <motion.p
@@ -260,12 +253,13 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                 )}
 
                 <motion.div variants={itemVariants}>
-                    <button
+                    <Button
                         type="submit"
-                        className="w-full flex justify-center py-4 px-4 mt-2 border border-transparent rounded-xl shadow-lg text-white font-bold text-lg bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                        fullWidth
+                        className="py-4 text-lg mt-2 hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                     >
                         Register
-                    </button>
+                    </Button>
                 </motion.div>
             </motion.form>
 
@@ -283,6 +277,6 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                     Or continue as a guest
                 </button>
             </motion.div>
-        </AuthLayout>
+        </AuthLayout >
     );
 };

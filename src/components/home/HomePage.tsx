@@ -4,6 +4,7 @@ import { FadeScroll } from '../common/FadeScroll';
 import { recipeService } from '@/services/recipeService.ts';
 import { APIRecipe } from '@/types.ts';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { Button } from '../common/Button';
 
 interface HomePageProps {
     onAnalyzeClick: () => void;
@@ -98,12 +99,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                         <p className="text-lg md:text-xl text-slate-200 mb-8 font-medium">
                             Join our community to explore, share, and enjoy authentic recipes from across the islands.
                         </p>
-                        <button
+                        <Button
                             onClick={onAnalyzeClick}
-                            className="bg-primary hover:bg-red-500 text-white px-8 py-3 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-primary/50 transform hover:-translate-y-1"
+                            className="px-8 py-3 text-lg hover:shadow-primary/50 transform hover:-translate-y-1"
                         >
                             Identify a Dish
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </section>
