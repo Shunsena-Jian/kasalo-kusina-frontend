@@ -1,9 +1,11 @@
 import { apiFetch } from './api';
 
-interface User {
+export interface User {
     id: string;
     username: string;
     email: string;
+    first_name?: string;
+    last_name?: string;
     user_type: string;
     user_status: string;
     created_at: string;
@@ -25,10 +27,10 @@ export const authService = {
         return response.data;
     },
 
-    register: async (username: string, email: string, password: string, user_type: string = 'kasalo'): Promise<User> => {
+    register: async (username: string, email: string, password: string, first_name: string, last_name: string, user_type: string = 'kasalo'): Promise<User> => {
         const response = await apiFetch<AuthResponse>(`/auth/register`, {
             method: 'POST',
-            body: JSON.stringify({ username, email, password, user_type }),
+            body: JSON.stringify({ username, email, password, first_name, last_name, user_type }),
         });
 
         localStorage.setItem('session', JSON.stringify(response.data));
@@ -37,5 +39,10 @@ export const authService = {
 
     logout: () => {
         localStorage.removeItem('session');
+    },
+
+    getCurrentUser: async (): Promise<User> => {
+        const response = await apiFetch<AuthResponse>(`/auth/me`);
+        return response.data;
     },
 };

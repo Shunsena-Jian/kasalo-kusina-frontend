@@ -20,5 +20,9 @@ export const recipeService = {
             body: formData,
         });
 
+    },
+
+    async searchRecipes(query: string): Promise<RecipeListResponse> {
+        return apiFetch<RecipeListResponse>(`/recipes?q=${encodeURIComponent(query)}`);
     }
 };

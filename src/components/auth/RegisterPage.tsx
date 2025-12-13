@@ -55,6 +55,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
     onNavigateToRegister,
     onNavigateToHome,
 }) => {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -69,7 +71,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
         setError('');
         setFieldErrors({});
 
-        if (!username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+        if (!firstName.trim() || !lastName.trim() || !username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
             setError('Please fill in all fields.');
             return;
         }
@@ -78,7 +80,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
             return;
         }
         try {
-            await import('../../services/authService').then(m => m.authService.register(username, email, password));
+            await import('../../services/authService').then(m => m.authService.register(username, email, password, firstName, lastName));
             onRegisterSuccess();
         } catch (err: any) {
             console.error(err);
@@ -151,6 +153,37 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                 onSubmit={handleRegisterAttempt}
                 className="space-y-5"
             >
+                <div className="flex gap-4">
+                    <motion.div variants={itemVariants} className="flex-1">
+                        <Input
+                            id="firstName"
+                            name="firstName"
+                            type="text"
+                            required
+                            label="First Name"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            placeholder="First Name"
+                            className="px-5 py-3"
+                            error={fieldErrors.first_name}
+                        />
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="flex-1">
+                        <Input
+                            id="lastName"
+                            name="lastName"
+                            type="text"
+                            required
+                            label="Last Name"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            placeholder="Last Name"
+                            className="px-5 py-3"
+                            error={fieldErrors.last_name}
+                        />
+                    </motion.div>
+                </div>
+
                 <motion.div variants={itemVariants}>
                     <Input
                         id="username"

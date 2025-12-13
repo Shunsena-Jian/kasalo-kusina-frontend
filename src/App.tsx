@@ -5,6 +5,8 @@ import { AnalyzePage } from './components/analyze/AnalyzePage';
 import { LoginPage } from './components/auth/LoginPage';
 import { RegisterPage } from './components/auth/RegisterPage';
 import { CreateRecipePage } from './components/recipe/CreateRecipePage';
+import { ProfilePage } from './components/profile/ProfilePage';
+import { SearchResultsPage } from './components/home/SearchResultsPage';
 import { analyzeDish, continueRecipeConversation } from './services/geminiService';
 import { useAuthState } from './hooks/useAuthState';
 import { useAppData } from './hooks/useAppData';
@@ -45,6 +47,17 @@ const App: React.FC = () => {
         showAuthPage(page);
         handleClear();
     };
+
+    React.useEffect(() => {
+        const handleUnauthorized = () => {
+            handleLogout();
+        };
+
+        window.addEventListener('auth:unauthorized', handleUnauthorized);
+        return () => {
+            window.removeEventListener('auth:unauthorized', handleUnauthorized);
+        };
+    }, [handleLogout]);
 
     const handleAnalyzeClick = async () => {
         if (!appData.imageFile && !appData.dishDescription.trim()) return;
@@ -120,14 +133,21 @@ const App: React.FC = () => {
         }
     };
 
-    const [currentView, setCurrentView] = useState<'home' | 'analyze' | 'create-recipe'>(() => {
+    const [currentView, setCurrentView] = useState<'home' | 'analyze' | 'create-recipe' | 'profile' | 'search'>(() => {
         const savedView = localStorage.getItem('currentView');
-        return (savedView as 'home' | 'analyze' | 'create-recipe') || 'home';
+        return (savedView as 'home' | 'analyze' | 'create-recipe' | 'profile' | 'search') || 'home';
+    });
+    const [searchQuery, setSearchQuery] = useState(() => {
+        return localStorage.getItem('searchQuery') || '';
     });
 
     React.useEffect(() => {
         localStorage.setItem('currentView', currentView);
     }, [currentView]);
+
+    React.useEffect(() => {
+        localStorage.setItem('searchQuery', searchQuery);
+    }, [searchQuery]);
 
     const handleNavigateToHome = () => {
         setCurrentView('home');
@@ -141,6 +161,15 @@ const App: React.FC = () => {
 
     const handleNavigateToCreateRecipe = () => {
         setCurrentView('create-recipe');
+    };
+
+    const handleNavigateToProfile = () => {
+        setCurrentView('profile');
+    };
+
+    const handleSearch = (query: string) => {
+        setSearchQuery(query);
+        setCurrentView('search');
     };
 
     const WelcomeMessage: React.FC = () => (
@@ -192,7 +221,9 @@ const App: React.FC = () => {
                 onNavigateToHome={handleNavigateToHome}
                 onNavigateToAnalyze={handleNavigateToAnalyze}
                 onNavigateToCreateRecipe={handleNavigateToCreateRecipe}
+                onNavigateToProfile={handleNavigateToProfile}
                 onLogoClick={handleNavigateToHome}
+                onSearch={handleSearch}
                 currentView={currentView}
             />
             <main className="container mx-auto px-4 pt-24 pb-8 max-w-4xl relative z-10 w-full">
@@ -211,8 +242,12 @@ const App: React.FC = () => {
                             onSendMessage={handleSendChatMessage}
                             onNavigateToRegister={() => navigateAndClear('register')}
                         />
-                    ) : (
+                    ) : currentView === 'create-recipe' ? (
                         <CreateRecipePage onNavigateToHome={handleNavigateToHome} />
+                    ) : currentView === 'search' ? (
+                        <SearchResultsPage query={searchQuery} onNavigateToHome={handleNavigateToHome} />
+                    ) : (
+                        <ProfilePage onNavigateToHome={handleNavigateToHome} />
                     )}
                 </PageTransition>
             </main>
