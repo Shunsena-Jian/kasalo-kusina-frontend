@@ -40,6 +40,7 @@ export const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ onNavigateTo
     const [servings, setServings] = useState<number | ''>('');
     const [difficulty, setDifficulty] = useState('easy');
     const [image, setImage] = useState<File | null>(null);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: '', quantity: '', unit: '' }]);
     const [instructions, setInstructions] = useState<Instruction[]>([{ step: 1, text: '' }]);
     const [tags, setTags] = useState('');
@@ -66,15 +67,29 @@ export const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ onNavigateTo
                 const draft = JSON.parse(savedDraft);
                 setTitle(draft.title || '');
                 setDescription(draft.description || '');
-                setPrepTime(draft.prepTime || '');
-                setCookTime(draft.cookTime || '');
-                setServings(draft.servings || '');
+                setPrepTime(draft.prepTime ?? '');
+                setCookTime(draft.cookTime ?? '');
+                setServings(draft.servings ?? '');
                 setDifficulty(draft.difficulty || 'easy');
                 setIngredients(draft.ingredients || [{ name: '', quantity: '', unit: '' }]);
                 setInstructions(draft.instructions || [{ step: 1, text: '' }]);
                 setTags(draft.tags || '');
                 if (draft.selectedCategories) {
                     setSelectedCategories(draft.selectedCategories);
+                }
+                if (draft.importedImage) {
+                    setPreviewImage(draft.importedImage);
+                    // Convert Blob URL to File object
+                    try {
+                        fetch(draft.importedImage)
+                            .then(res => res.blob())
+                            .then(blob => {
+                                const file = new File([blob], "imported_image.jpg", { type: blob.type });
+                                setImage(file);
+                            });
+                    } catch (err) {
+                        console.error("Failed to convert imported image to File", err);
+                    }
                 }
             } catch (e) {
                 console.error("Failed to parse recipe draft", e);
@@ -152,7 +167,9 @@ export const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ onNavigateTo
 
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setImage(e.target.files[0]);
+            const file = e.target.files[0];
+            setImage(file);
+            setPreviewImage(URL.createObjectURL(file));
         }
     };
 
@@ -377,15 +394,15 @@ export const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ onNavigateTo
                                     type="text"
                                     placeholder="Qty"
                                     required
-                                    containerClassName="w-20"
-                                    className="py-2 text-sm"
+                                    containerClassName="!w-20 flex-none"
+                                    className="py-2 text-sm text-center"
                                     value={ing.quantity}
                                     onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
                                 />
                                 <Input
                                     type="text"
                                     placeholder="Unit"
-                                    containerClassName="w-20"
+                                    containerClassName="!w-28 flex-none"
                                     className="py-2 text-sm"
                                     value={ing.unit}
                                     onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
@@ -434,6 +451,27 @@ export const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ onNavigateTo
                 {/* Image */}
                 <motion.div variants={itemVariants}>
                     <label className="block text-sm font-bold text-slate-700 mb-1 ml-1">Recipe Image</label>
+                    {previewImage && (
+                        <div className="mb-4 relative w-full h-64 rounded-xl overflow-hidden shadow-md group">
+                            <img
+                                src={previewImage}
+                                alt="Recipe Preview"
+                                className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setImage(null);
+                                        setPreviewImage(null);
+                                    }}
+                                    className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-600 transition-colors"
+                                >
+                                    Remove Image
+                                </button>
+                            </div>
+                        </div>
+                    )}
                     <input
                         type="file"
                         accept="image/*"

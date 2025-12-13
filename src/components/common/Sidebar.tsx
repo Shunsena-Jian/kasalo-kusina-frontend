@@ -126,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 onClick={() => { onNavigateToAnalyze?.(); onClose(); }}
                                 className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 font-semibold text-slate-700 hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
                             >
-                                <span>🔍</span> Analyze Dish
+                                <span>✨</span> AI Chef
                             </button>
                             <hr className="border-white/30 my-2" />
                             <button

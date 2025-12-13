@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { RecipeCard } from './RecipeCard';
 import { Carousel } from '../common/Carousel';
 import { recipeService } from '@/services/recipeService.ts';
-import { APIRecipe } from '@/types.ts';
+import { categoryService } from '@/services/categoryService.ts';
+import { APIRecipe, Category } from '@/types.ts';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { Button } from '../common/Button';
 
@@ -14,21 +15,24 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
     const [featuredRecipes, setFeaturedRecipes] = useState<APIRecipe[]>([]);
     const [newRecipes, setNewRecipes] = useState<APIRecipe[]>([]);
     const [highRatedRecipes, setHighRatedRecipes] = useState<APIRecipe[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [featured, newArrivals, highRated] = await Promise.all([
+                const [featured, newArrivals, highRated, categoriesData] = await Promise.all([
                     recipeService.getFeaturedRecipes(),
                     recipeService.getNewRecipes(),
                     recipeService.getHighRatedRecipes(),
+                    categoryService.getCategories(),
                 ]);
 
                 setFeaturedRecipes(featured.data);
                 setNewRecipes(newArrivals.data);
                 setHighRatedRecipes(highRated.data);
+                setCategories(categoriesData);
             } catch (err) {
                 console.error('Error fetching recipes:', err);
                 setError('Failed to load recipes. Please check your connection.');
@@ -57,6 +61,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
         const apiUrl = import.meta.env.VITE_API_URL || '';
         const baseUrl = apiUrl.replace(/\/api\/?$/, '');
         return `${baseUrl}${imagePath}`;
+    };
+
+    const getCategoryNames = (categoryIds: string[]): string[] => {
+        return categoryIds.map(id => {
+            const cat = categories.find(c => c._id === id);
+            return cat ? cat.name : '';
+        }).filter(name => name !== '');
     };
 
     if (isLoading) {
@@ -101,9 +112,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                         </p>
                         <Button
                             onClick={onAnalyzeClick}
-                            className="px-8 py-3 text-lg hover:shadow-primary/50 transform hover:-translate-y-1"
+                            className="px-8 py-3 text-lg hover:shadow-primary/50 transform hover:-translate-y-1 bg-gradient-to-r from-primary to-secondary border-none"
                         >
-                            Identify a Dish
+                            ✨ Try the AI Chef
                         </Button>
                     </div>
                 </div>
@@ -128,7 +139,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                                 image={getImageUrl(recipe.image)}
                                 rating={recipe.average_rating}
                                 time={formatTime(recipe.prep_time_min, recipe.cook_time_min)}
-                                description={recipe.description}
+                                difficulty={recipe.difficulty}
+                                categories={getCategoryNames(recipe.categories)}
                                 onClick={() => { }}
                             />
                         </div>
@@ -147,7 +159,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                                 image={getImageUrl(recipe.image)}
                                 rating={recipe.average_rating}
                                 time={formatTime(recipe.prep_time_min, recipe.cook_time_min)}
-                                description={recipe.description}
+                                difficulty={recipe.difficulty}
+                                categories={getCategoryNames(recipe.categories)}
                                 onClick={() => { }}
                             />
                         </div>
@@ -166,7 +179,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
                                 image={getImageUrl(recipe.image)}
                                 rating={recipe.average_rating}
                                 time={formatTime(recipe.prep_time_min, recipe.cook_time_min)}
-                                description={recipe.description}
+                                difficulty={recipe.difficulty}
+                                categories={getCategoryNames(recipe.categories)}
                                 onClick={() => { }}
                             />
                         </div>

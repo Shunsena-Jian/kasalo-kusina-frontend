@@ -22,8 +22,13 @@ const RECIPE_SCHEMA = {
         ingredients: {
             type: Type.ARRAY,
             items: {
-                type: Type.STRING,
-                description: 'An ingredient for the recipe, including quantity.',
+                type: Type.OBJECT,
+                properties: {
+                    name: { type: Type.STRING, description: 'Name of the ingredient' },
+                    quantity: { type: Type.STRING, description: 'Quantity (numbers only)' },
+                    unit: { type: Type.STRING, description: 'Unit (e.g., cups, lbs, kgs, etc.)' },
+                },
+                required: ['name', 'quantity', 'unit'],
             },
             description: 'A list of all ingredients required for the dish.',
         },
@@ -35,8 +40,25 @@ const RECIPE_SCHEMA = {
             },
             description: 'The step-by-step cooking directions.',
         },
+        prepTime: {
+            type: Type.INTEGER,
+            description: 'Preparation time in minutes (number only).',
+        },
+        cookTime: {
+            type: Type.INTEGER,
+            description: 'Cooking time in minutes (number only).',
+        },
+        servings: {
+            type: Type.INTEGER,
+            description: 'Number of servings (number only).',
+        },
+        difficulty: {
+            type: Type.STRING,
+            description: 'Difficulty level (easy, medium, hard).',
+            enum: ['easy', 'medium', 'hard'],
+        },
     },
-    required: ['dishName', 'ingredients', 'directions'],
+    required: ['dishName', 'ingredients', 'directions', 'prepTime', 'cookTime', 'servings', 'difficulty'],
 };
 
 export const analyzeDish = async (imageFile: File | null, description: string): Promise<Recipe> => {
@@ -51,10 +73,13 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
         User's text description: "${description || 'No description provided.'}"
         
         1. Identify the specific name of the dish from the image and/or text.
-        2. Provide a comprehensive list of ingredients with quantities.
+        2. Provide a comprehensive list of ingredients. For each ingredient, separate the name, quantity (number only), and unit.
         3. Provide the detailed step-by-step cooking directions.
+        4. Estimate the preparation time and cooking time in minutes.
+        5. Estimate the number of servings.
+        6. Determine the difficulty level (easy, medium, hard).
 
-        Return the response in JSON format. If you cannot confidently identify the dish as Filipino cuisine, return a JSON object with a "dishName" of "Unknown Dish" and empty arrays for ingredients and directions.
+        Return the response in JSON format according to the schema. If you cannot confidently identify the dish as Filipino cuisine, return a JSON object with a "dishName" of "Unknown Dish" and empty/zero values for other fields.
     `;
 
     if (imageFile) {
@@ -65,7 +90,7 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
     promptParts.push({ text: promptText });
 
     const recipeResult = await ai.models.generateContent({
-        model: 'gemini-2.5-pro',
+        model: 'gemini-2.5-flash',
         contents: { parts: promptParts },
         config: {
             responseMimeType: 'application/json',
@@ -80,34 +105,7 @@ export const analyzeDish = async (imageFile: File | null, description: string): 
         return { ...recipeData, imageUrl: undefined };
     }
 
-    // Generate an image for the identified dish, whether from text or image
-    const imageResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
-        contents: {
-            parts: [
-                {
-                    text: `A delicious-looking, professionally photographed plate of Filipino ${recipeData.dishName}`,
-                },
-            ],
-        },
-        config: {
-            responseModalities: [Modality.IMAGE],
-        },
-    });
-
-    let imageUrl: string | undefined = imageFile ? URL.createObjectURL(imageFile) : undefined;
-
-    if (!imageFile) {
-        for (const part of imageResponse.candidates[0].content.parts) {
-            if (part.inlineData) {
-                const base64ImageBytes: string = part.inlineData.data;
-                imageUrl = `data:${part.inlineData.mimeType};base64,${base64ImageBytes}`;
-                break;
-            }
-        }
-    }
-
-    return { ...recipeData, imageUrl };
+    return { ...recipeData };
 };
 
 const CHAT_RESPONSE_SCHEMA = {

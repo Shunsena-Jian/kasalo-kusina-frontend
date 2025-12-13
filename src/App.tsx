@@ -172,6 +172,24 @@ const App: React.FC = () => {
         setCurrentView('search');
     };
 
+    const handleImportRecipe = (recipe: Recipe, imageUrl?: string | null) => {
+        const draft = {
+            title: recipe.dishName,
+            description: `A delicious recipe for ${recipe.dishName}.`,
+            prepTime: recipe.prepTime || '',
+            cookTime: recipe.cookTime || '',
+            servings: recipe.servings || '',
+            difficulty: recipe.difficulty || 'medium',
+            ingredients: recipe.ingredients, // Now matches structure
+            instructions: recipe.directions.map((step, index) => ({ step: index + 1, text: step })),
+            tags: '',
+            selectedCategories: [],
+            importedImage: imageUrl || recipe.imageUrl // Prioritize passed image URL (user upload), fallback to AI recipe URL
+        };
+        localStorage.setItem('createRecipeDraft', JSON.stringify(draft));
+        setCurrentView('create-recipe');
+    };
+
     const WelcomeMessage: React.FC = () => (
         <div className="text-center p-8 glass rounded-3xl border border-white/40 shadow-lg">
             <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-3">Welcome to Kasalo Kusina!</h2>
@@ -241,6 +259,7 @@ const App: React.FC = () => {
                             onAnalyzeClick={handleAnalyzeClick}
                             onSendMessage={handleSendChatMessage}
                             onNavigateToRegister={() => navigateAndClear('register')}
+                            onImportRecipe={handleImportRecipe}
                         />
                     ) : currentView === 'create-recipe' ? (
                         <CreateRecipePage onNavigateToHome={handleNavigateToHome} />

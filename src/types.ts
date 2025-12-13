@@ -1,7 +1,17 @@
+export interface Ingredient {
+    name: string;
+    quantity: string;
+    unit: string;
+}
+
 export interface Recipe {
     dishName: string;
-    ingredients: string[];
+    ingredients: Ingredient[];
     directions: string[];
+    prepTime?: number;
+    cookTime?: number;
+    servings?: number;
+    difficulty?: string;
     imageUrl?: string;
 }
 

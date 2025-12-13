@@ -71,6 +71,42 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                 {recipe.dishName}
             </h2>
 
+            {/* Metadata Badges */}
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+                {recipe.prepTime !== undefined && recipe.prepTime !== null && (
+                    <div className="flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-2 rounded-full font-bold shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                        </svg>
+                        Prep: {recipe.prepTime} min
+                    </div>
+                )}
+                {recipe.cookTime !== undefined && recipe.cookTime !== null && (
+                    <div className="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full font-bold shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                        </svg>
+                        Cook: {recipe.cookTime} min
+                    </div>
+                )}
+                {recipe.servings && (
+                    <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-bold shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                        </svg>
+                        {recipe.servings} Servings
+                    </div>
+                )}
+                {recipe.difficulty && (
+                    <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-sm capitalize ${recipe.difficulty === 'easy' ? 'bg-green-100 text-green-700' : recipe.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+                        </svg>
+                        {recipe.difficulty}
+                    </div>
+                )}
+            </div>
+
             <div className="grid md:grid-cols-5 gap-8">
                 <div className="md:col-span-2">
                     <h3 className="text-2xl font-bold text-secondary mb-4 flex items-center gap-2">
@@ -92,7 +128,9 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                     </h3>
                     <ul className="list-disc list-inside space-y-2 text-slate-700 pl-2">
                         {recipe.ingredients.map((ingredient, index) => (
-                            <li key={index}>{ingredient}</li>
+                            <li key={index}>
+                                <span className="font-bold">{ingredient.quantity} {ingredient.unit}</span> {ingredient.name}
+                            </li>
                         ))}
                     </ul>
                 </div>
@@ -175,6 +213,6 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                     </button>
                 </form>
             </div>
-        </motion.div>
+        </motion.div >
     );
 };

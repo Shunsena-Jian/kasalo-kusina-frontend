@@ -147,13 +147,13 @@ export const DishInput: React.FC<DishInputProps> = ({
                 )}
             </div>
 
-            <div className="relative flex flex-col sm:flex-row gap-2 items-start">
+            <div className="relative flex flex-col sm:flex-row gap-4 items-start">
                 {imagePreviewUrl && (
-                    <div className="relative w-full sm:w-32 h-32 flex-shrink-0">
+                    <div className="relative w-full sm:w-48 h-48 flex-shrink-0">
                         <img
                             src={imagePreviewUrl}
                             alt="Dish preview"
-                            className="w-full h-full object-cover rounded-lg shadow-md"
+                            className="w-full h-full object-cover rounded-xl shadow-md"
                         />
                         <button
                             onClick={handleClearImage}
@@ -171,7 +171,7 @@ export const DishInput: React.FC<DishInputProps> = ({
                     value={description}
                     onChange={(e) => onDescriptionChange(e.target.value)}
                     placeholder="e.g., 'a sour and savory soup with pork and tamarind', 'chicken adobo', or upload a photo..."
-                    className="w-full h-32 p-3 bg-slate-50 border border-slate-200 rounded-xl shadow-inner placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors disabled:bg-slate-100"
+                    className="w-full h-48 p-3 bg-slate-50 border border-slate-200 rounded-xl shadow-inner placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors disabled:bg-slate-100 resize-none"
                     aria-label="Describe the dish"
                     disabled={isLoading || isGuest}
                 />

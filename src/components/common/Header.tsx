@@ -152,9 +152,9 @@ export const Header: React.FC<HeaderProps> = ({
                                 <div className="w-px h-4 bg-slate-200 mx-1"></div>
                                 <button
                                     onClick={onNavigateToAnalyze}
-                                    className={navLinkClass(currentView === 'analyze')}
+                                    className={`${navLinkClass(currentView === 'analyze')} font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark`}
                                 >
-                                    Analyze Dish
+                                    ✨ AI Chef
                                 </button>
                             </nav>
                         )}

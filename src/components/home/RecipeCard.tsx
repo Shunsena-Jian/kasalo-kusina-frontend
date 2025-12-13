@@ -6,7 +6,8 @@ interface RecipeCardProps {
     image: string;
     rating: number;
     time: string;
-    description: string;
+    difficulty: string;
+    categories: string[];
     onClick: () => void;
 }
 
@@ -15,7 +16,8 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
     image,
     rating,
     time,
-    description,
+    difficulty,
+    categories = [],
     onClick,
 }) => {
     return (
@@ -41,7 +43,25 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
                         <span className="text-sm font-semibold text-slate-700">{rating}</span>
                     </div>
                 </div>
-                <p className="text-slate-600 text-sm line-clamp-2 mb-4 flex-grow">{description}</p>
+
+                <div className="flex-grow space-y-3 mb-4">
+                    <div className="flex flex-wrap gap-2">
+                        <span className={`px-2 py-1 rounded-md text-xs font-bold capitalize ${difficulty === 'easy' ? 'bg-green-100 text-green-700' :
+                            difficulty === 'medium' ? 'bg-orange-100 text-orange-700' :
+                                'bg-red-100 text-red-700'
+                            }`}>
+                            {difficulty}
+                        </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1">
+                        {categories.map((cat, index) => (
+                            <span key={index} className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+                                {cat}
+                            </span>
+                        ))}
+                    </div>
+                </div>
                 <Button fullWidth className="text-sm">
                     View Recipe
                 </Button>
