@@ -120,7 +120,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="text-slate-600 mt-2 font-medium"
+                    className="text-slate-600 dark:text-slate-400 mt-2 font-medium"
                 >
                     Sign in to discover recipes
                 </motion.p>
@@ -165,7 +165,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                         <button
                             type="button"
                             onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                            className="absolute right-0 top-9 pr-3 flex items-center text-slate-500 hover:text-primary transition-colors"
+                            className="absolute right-0 top-9 pr-3 flex items-center text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors"
                             aria-label={isPasswordVisible ? 'Hide password' : 'Show password'}
                         >
                             {isPasswordVisible ? (

@@ -51,7 +51,7 @@ export const Select: React.FC<SelectProps> = ({
     return (
         <div className={`w-full ${containerClassName}`} ref={containerRef}>
             {label && (
-                <label className="block text-sm font-bold text-slate-700 mb-1 ml-1">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-1 ml-1">
                     {label}
                 </label>
             )}
@@ -59,12 +59,12 @@ export const Select: React.FC<SelectProps> = ({
                 <button
                     type="button"
                     onClick={() => setIsOpen(!isOpen)}
-                    className={`w-full text-left px-4 py-3 bg-slate-50 border rounded-xl shadow-inner transition-colors flex justify-between items-center outline-none ${isOpen
-                            ? 'ring-2 ring-primary border-primary'
-                            : 'border-slate-200 hover:bg-slate-100'
+                    className={`w-full text-left px-4 py-3 bg-slate-50 dark:bg-slate-900 border rounded-xl shadow-inner transition-colors flex justify-between items-center outline-none ${isOpen
+                        ? 'ring-2 ring-primary border-primary'
+                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
                         } ${className}`}
                 >
-                    <span className={`font-medium ${!selectedOption ? 'text-slate-400' : 'text-slate-800'}`}>
+                    <span className={`font-medium ${!selectedOption ? 'text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'}`}>
                         {selectedOption ? selectedOption.label : placeholder}
                     </span>
                     <svg
@@ -88,7 +88,7 @@ export const Select: React.FC<SelectProps> = ({
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -10, scale: 0.95 }}
                             transition={{ duration: 0.1 }}
-                            className="absolute z-50 w-full mt-2 bg-white/80 backdrop-blur-xl border border-white/40 rounded-xl shadow-xl overflow-hidden"
+                            className="absolute z-50 w-full mt-2 bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl border border-white/40 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden"
                         >
                             <ul className="py-1 max-h-60 overflow-auto custom-scrollbar">
                                 {options.map((option) => (
@@ -97,8 +97,8 @@ export const Select: React.FC<SelectProps> = ({
                                             type="button"
                                             onClick={() => handleSelect(option.value)}
                                             className={`w-full text-left px-4 py-2 text-sm font-medium transition-colors ${option.value === value
-                                                    ? 'bg-primary/10 text-primary'
-                                                    : 'text-slate-600 hover:bg-slate-50 hover:text-primary'
+                                                ? 'bg-primary/10 text-primary'
+                                                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary'
                                                 }`}
                                         >
                                             {option.label}

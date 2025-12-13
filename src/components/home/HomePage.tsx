@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { RecipeCard } from './RecipeCard';
+import { RecipeCard } from '../common/RecipeCard';
 import { Carousel } from '../common/Carousel';
 import { recipeService } from '@/services/recipeService.ts';
 import { categoryService } from '@/services/categoryService.ts';
@@ -124,8 +124,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
             <section>
                 <div className="flex justify-between items-end mb-6">
                     <div>
-                        <h2 className="text-3xl font-bold text-slate-800">Featured Recipes</h2>
-                        <p className="text-slate-500 mt-1">Curated favorites just for you</p>
+                        <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Featured Recipes</h2>
+                        <p className="text-slate-500 dark:text-slate-400 mt-1">Curated favorites just for you</p>
                     </div>
                     <button className="text-primary font-semibold hover:text-red-500 transition-colors">
                         View All
@@ -150,7 +150,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
 
             {/* New Arrivals */}
             <section>
-                <h2 className="text-3xl font-bold text-slate-800 mb-6">Fresh from the Kitchen</h2>
+                <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-6">Fresh from the Kitchen</h2>
                 <Carousel autoPlay interval={4000}>
                     {newRecipes.map((recipe, index) => (
                         <div key={index} className="min-w-[85%] sm:min-w-[320px] snap-center">
@@ -170,7 +170,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onAnalyzeClick }) => {
 
             {/* High Rated */}
             <section>
-                <h2 className="text-3xl font-bold text-slate-800 mb-6">Community Favorites</h2>
+                <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-6">Community Favorites</h2>
                 <Carousel autoPlay interval={3500}>
                     {highRatedRecipes.map((recipe, index) => (
                         <div key={index} className="min-w-[85%] sm:min-w-[320px] snap-center">

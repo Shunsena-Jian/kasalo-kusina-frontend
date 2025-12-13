@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { recipeService } from '../../services/recipeService';
 import { APIRecipe } from '../../types';
-import { RecipeCard } from '../home/RecipeCard';
+import { RecipeCard } from '../common/RecipeCard';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 
 interface SearchResultsPageProps {
@@ -77,14 +77,14 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({ query, onN
             <div className="mb-8">
                 <button
                     onClick={onNavigateToHome}
-                    className="text-slate-500 hover:text-primary font-bold mb-4 flex items-center gap-2 transition-colors"
+                    className="text-slate-500 dark:text-slate-400 hover:text-primary font-bold mb-4 flex items-center gap-2 transition-colors"
                 >
                     ← Back to Home
                 </button>
-                <h2 className="text-3xl font-extrabold text-slate-800">
+                <h2 className="text-3xl font-extrabold text-slate-800 dark:text-slate-200">
                     Search Results for <span className="text-primary">"{query}"</span>
                 </h2>
-                <p className="text-slate-500 mt-2">
+                <p className="text-slate-500 dark:text-slate-400 mt-2">
                     Found {recipes.length} recipe{recipes.length !== 1 ? 's' : ''}
                 </p>
             </div>
@@ -98,10 +98,10 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({ query, onN
                     <p className="text-red-600 font-bold">{error}</p>
                 </div>
             ) : recipes.length === 0 ? (
-                <div className="text-center py-20 glass rounded-3xl border border-white/50">
+                <div className="text-center py-20 glass rounded-3xl border border-white/50 dark:border-slate-700">
                     <span className="text-6xl mb-4 block">🍳</span>
-                    <h3 className="text-2xl font-bold text-slate-700 mb-2">No recipes found</h3>
-                    <p className="text-slate-500 max-w-md mx-auto">
+                    <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-200 mb-2">No recipes found</h3>
+                    <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                         We couldn't find any recipes matching "{query}". Try different keywords or browse our categories.
                     </p>
                     <button

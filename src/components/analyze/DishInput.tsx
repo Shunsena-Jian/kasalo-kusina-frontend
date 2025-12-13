@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
+import { TextArea } from '../common/TextArea';
 
 interface DishInputProps {
     onImageSelect: (file: File | null) => void;
@@ -115,10 +116,10 @@ export const DishInput: React.FC<DishInputProps> = ({
     return (
         <div className="w-full space-y-4 relative">
             {isGuest && (
-                <div className="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-10 rounded-2xl flex flex-col items-center justify-center p-6 text-center">
+                <div className="absolute inset-0 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-sm z-10 rounded-2xl flex flex-col items-center justify-center p-6 text-center">
                     <LockIcon />
-                    <h3 className="text-lg font-bold text-slate-800">AI Features Locked</h3>
-                    <p className="text-slate-600 text-sm mb-4">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">AI Features Locked</h3>
+                    <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
                         Register for free to get recipes from photos and chat with our AI chef.
                     </p>
                     <button
@@ -132,14 +133,14 @@ export const DishInput: React.FC<DishInputProps> = ({
             <div className="flex justify-between items-center">
                 <label
                     htmlFor="dish-description"
-                    className="block text-lg font-semibold text-slate-700"
+                    className="block text-lg font-semibold text-slate-700 dark:text-slate-200"
                 >
                     Describe a Filipino Dish
                 </label>
                 {(imagePreviewUrl || description) && (
                     <button
                         onClick={onClear}
-                        className="text-sm font-medium text-slate-500 hover:text-red-600 transition-colors flex items-center gap-1"
+                        className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-red-600 transition-colors flex items-center gap-1"
                     >
                         <ClearIcon />
                         Clear All
@@ -166,12 +167,12 @@ export const DishInput: React.FC<DishInputProps> = ({
                     </div>
                 )}
 
-                <textarea
+                <TextArea
                     id="dish-description"
                     value={description}
                     onChange={(e) => onDescriptionChange(e.target.value)}
                     placeholder="e.g., 'a sour and savory soup with pork and tamarind', 'chicken adobo', or upload a photo..."
-                    className="w-full h-48 p-3 bg-slate-50 border border-slate-200 rounded-xl shadow-inner placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors disabled:bg-slate-100 resize-none"
+                    className="h-48 resize-none"
                     aria-label="Describe the dish"
                     disabled={isLoading || isGuest}
                 />
@@ -212,7 +213,7 @@ export const DishInput: React.FC<DishInputProps> = ({
                     whileTap={{ scale: 0.98 }}
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading || isGuest || imageFeaturesDisabled}
-                    className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:border-primary hover:text-primary transition-all disabled:bg-slate-100 disabled:cursor-not-allowed"
+                    className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl shadow-sm hover:border-primary hover:text-primary transition-all disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:cursor-not-allowed"
                 >
                     <UploadIcon />
                     Upload Photo
@@ -222,7 +223,7 @@ export const DishInput: React.FC<DishInputProps> = ({
                     whileTap={{ scale: 0.98 }}
                     onClick={() => cameraInputRef.current?.click()}
                     disabled={isLoading || isGuest || imageFeaturesDisabled}
-                    className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:border-primary hover:text-primary transition-all disabled:bg-slate-100 disabled:cursor-not-allowed"
+                    className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl shadow-sm hover:border-primary hover:text-primary transition-all disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:cursor-not-allowed"
                 >
                     <CameraIcon />
                     Use Camera

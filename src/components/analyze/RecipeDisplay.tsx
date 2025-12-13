@@ -20,7 +20,7 @@ const UserMessage: React.FC<{ text: string }> = ({ text }) => (
 
 const AiMessage: React.FC<{ text: string }> = ({ text }) => (
     <div className="flex justify-start">
-        <div className="bg-slate-200 text-slate-800 rounded-lg rounded-bl-none py-2 px-4 max-w-sm">
+        <div className="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-lg rounded-bl-none py-2 px-4 max-w-sm">
             {text}
         </div>
     </div>
@@ -126,7 +126,7 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                         </svg>
                         Ingredients
                     </h3>
-                    <ul className="list-disc list-inside space-y-2 text-slate-700 pl-2">
+                    <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-200 pl-2">
                         {recipe.ingredients.map((ingredient, index) => (
                             <li key={index}>
                                 <span className="font-bold">{ingredient.quantity} {ingredient.unit}</span> {ingredient.name}
@@ -153,7 +153,7 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                         </svg>
                         Directions
                     </h3>
-                    <ol className="list-decimal list-inside space-y-4 text-slate-700 pl-2">
+                    <ol className="list-decimal list-inside space-y-4 text-slate-700 dark:text-slate-200 pl-2">
                         {recipe.directions.map((direction, index) => (
                             <li key={index} className="pl-2 leading-relaxed">
                                 {direction}
@@ -164,11 +164,11 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
             </div>
 
             {/* Chat Interface */}
-            <div className="mt-8 pt-6 border-t border-slate-200">
-                <h3 className="text-xl font-semibold text-center text-slate-700 mb-4">
+            <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
+                <h3 className="text-xl font-semibold text-center text-slate-700 dark:text-slate-200 mb-4">
                     Chat with your Kusina Assistant
                 </h3>
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 h-64 overflow-y-auto space-y-4 shadow-inner">
+                <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 h-64 overflow-y-auto space-y-4 shadow-inner">
                     {chatHistory.map((msg, index) =>
                         msg.sender === 'user' ? (
                             <UserMessage key={index} text={msg.text} />
@@ -178,9 +178,9 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                     )}
                     {isAwaitingResponse && (
                         <div className="flex justify-start">
-                            <div className="bg-slate-200 rounded-lg rounded-bl-none py-2 px-4 inline-flex items-center gap-2">
+                            <div className="bg-slate-200 dark:bg-slate-700 rounded-lg rounded-bl-none py-2 px-4 inline-flex items-center gap-2">
                                 <LoadingSpinner />
-                                <span className="text-sm text-slate-600">Thinking...</span>
+                                <span className="text-sm text-slate-600 dark:text-slate-300">Thinking...</span>
                             </div>
                         </div>
                     )}
@@ -193,7 +193,7 @@ export const RecipeDisplay: React.FC<RecipeDisplayProps> = ({
                         onChange={(e) => setUserMessage(e.target.value)}
                         placeholder="e.g., 'Can I make this vegetarian?'"
                         disabled={isAwaitingResponse}
-                        className="flex-grow w-full px-5 py-3 bg-white border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors disabled:bg-slate-100"
+                        className="flex-grow w-full px-5 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm placeholder-slate-400 dark:placeholder-slate-500 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors disabled:bg-slate-100 dark:disabled:bg-slate-900"
                         aria-label="Chat with AI assistant"
                     />
                     <button

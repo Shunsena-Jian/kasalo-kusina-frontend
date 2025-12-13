@@ -20,10 +20,10 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
     return (
         <div className="min-h-screen flex flex-col relative overflow-hidden">
             {/* Background Blob Animation */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 bg-gradient-to-br from-light to-white">
-                <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/30 rounded-full blur-3xl animate-blob"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-secondary/30 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-                <div className="absolute top-[40%] left-[40%] w-96 h-96 bg-accent/30 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 bg-gradient-to-br from-light to-white dark:from-slate-900 dark:to-slate-950 transition-colors duration-300">
+                <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/30 dark:bg-primary/10 rounded-full blur-3xl animate-blob"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-secondary/30 dark:bg-secondary/10 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+                <div className="absolute top-[40%] left-[40%] w-96 h-96 bg-accent/30 dark:bg-accent/10 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
             </div>
 
             <Header

@@ -1,37 +1,39 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-ag-08" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Kasalo Kusina</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            primary: '#FF6B6B', // Coral Red
-                            secondary: '#4ECDC4', // Medium Turquoise
-                            accent: '#FFE66D', // Maize Crayola
-                            dark: '#292F36', // Gunmetal
-                            light: '#F7FFF7', // Mint Cream
-                        },
-                        animation: {
-                            'blob': 'blob 7s infinite',
-                        },
-                        keyframes: {
-                            blob: {
-                                '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                                '100%': { transform: 'translate(0px, 0px) scale(1)' },
-                            }
+
+<head>
+    <meta charset="UTF-ag-08" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kasalo Kusina</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B', // Coral Red
+                        secondary: '#4ECDC4', // Medium Turquoise
+                        accent: '#FFE66D', // Maize Crayola
+                        dark: '#292F36', // Gunmetal
+                        light: '#F7FFF7', // Mint Cream
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         }
                     }
                 }
             }
-        </script>
-        <script type="importmap">
+        }
+    </script>
+    <script type="importmap">
             {
                 "imports": {
                     "react": "https://aistudiocdn.com/react@^19.2.0",
@@ -42,25 +44,39 @@
                 }
             }
         </script>
-        <style>
-            body {
-                background-color: #F7FFF7;
-                background-image: 
-                    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                    radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                    radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-                min-height: 100vh;
-                background-attachment: fixed;
-            }
-            .glass {
-                background: rgba(255, 255, 255, 0.7);
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-            }
-        </style>
-    </head>
-    <body class="text-slate-800 font-sans">
-        <div id="root"></div>
-        <script type="module" src="/src/index.tsx"></script>
-    </body>
+    <style>
+        body {
+            /* background-color handled by tailwind classes now */
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark .glass {
+            background: rgba(30, 41, 59, 0.7);
+            /* slate-800 with opacity */
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Dark mode scrollbar support */
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 font-sans bg-light dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+</body>
+
 </html>

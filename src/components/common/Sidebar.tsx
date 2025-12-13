@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeToggle } from './ThemeToggle';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -8,7 +9,10 @@ interface SidebarProps {
     onNavigateToAnalyze?: () => void;
     onNavigateToCreateRecipe?: () => void;
     onNavigateToProfile?: () => void;
+    onNavigateToLogin?: () => void;
+    onNavigateToRegister?: () => void;
     onLogout?: () => void;
+    userType?: 'guest' | 'registered' | null;
 }
 
 const sidebarVariants = {
@@ -61,8 +65,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onNavigateToAnalyze,
     onNavigateToCreateRecipe,
     onNavigateToProfile,
-    onLogout
+    onNavigateToLogin,
+    onNavigateToRegister,
+    onLogout,
+    userType = 'registered'
 }) => {
+
     // Prevent scrolling when sidebar is open
     useEffect(() => {
         if (isOpen) {
@@ -101,9 +109,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             <h2 className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Menu</h2>
                             <button
                                 onClick={onClose}
-                                className="p-2 hover:bg-white/50 rounded-full transition-colors"
+                                className="p-2 hover:bg-white/50 dark:hover:bg-slate-700/50 rounded-full transition-colors"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
@@ -112,43 +120,70 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <nav className="flex-grow space-y-2">
                             <button
                                 onClick={() => { onNavigateToHome?.(); onClose(); }}
-                                className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 font-semibold text-slate-700 hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
+                                className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-700/50 font-semibold text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
                             >
                                 <span>🏠</span> Home
                             </button>
-                            <button
-                                onClick={() => { onNavigateToCreateRecipe?.(); onClose(); }}
-                                className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 font-semibold text-slate-700 hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
-                            >
-                                <span>🍳</span> Create Recipe
-                            </button>
-                            <button
-                                onClick={() => { onNavigateToAnalyze?.(); onClose(); }}
-                                className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 font-semibold text-slate-700 hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
-                            >
-                                <span>✨</span> AI Chef
-                            </button>
-                            <hr className="border-white/30 my-2" />
-                            <button
-                                onClick={() => { onNavigateToProfile?.(); onClose(); }}
-                                className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 font-semibold text-slate-700 hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
-                            >
-                                <span>👤</span> Profile
-                            </button>
-                            <button
-                                className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 font-semibold text-slate-700 hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
-                            >
-                                <span>⚙️</span> Settings
-                            </button>
+
+                            {userType === 'registered' && (
+                                <>
+                                    <button
+                                        onClick={() => { onNavigateToCreateRecipe?.(); onClose(); }}
+                                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-700/50 font-semibold text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
+                                    >
+                                        <span>🍳</span> Create Recipe
+                                    </button>
+                                    <button
+                                        onClick={() => { onNavigateToAnalyze?.(); onClose(); }}
+                                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-700/50 font-semibold text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
+                                    >
+                                        <span>✨</span> AI Chef
+                                    </button>
+                                    <hr className="border-white/30 dark:border-slate-700/50 my-2" />
+                                    <button
+                                        onClick={() => { onNavigateToProfile?.(); onClose(); }}
+                                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-700/50 font-semibold text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
+                                    >
+                                        <span>👤</span> Profile
+                                    </button>
+                                </>
+                            )}
+
+                            <div className="mt-2 pt-2 border-t border-white/30 dark:border-slate-700/50">
+                                <p className="px-4 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Settings</p>
+                                <div className="px-4 py-2 flex items-center justify-between">
+                                    <div className="flex items-center gap-3 font-semibold text-slate-700 dark:text-slate-200">
+                                        <span>🌙</span> Dark Mode
+                                    </div>
+                                    <ThemeToggle />
+                                </div>
+                            </div>
                         </nav>
 
-                        <div className="mt-6 pt-4 border-t border-white/30">
-                            <button
-                                onClick={() => { onLogout?.(); onClose(); }}
-                                className="w-full text-left px-4 py-3 rounded-xl bg-red-50/80 text-red-600 font-bold hover:bg-red-100 transition-colors flex items-center gap-3 backdrop-blur-sm"
-                            >
-                                <span>🚪</span> Logout
-                            </button>
+                        <div className="mt-6 pt-4 border-t border-white/30 dark:border-slate-700/50">
+                            {userType === 'registered' ? (
+                                <button
+                                    onClick={() => { onLogout?.(); onClose(); }}
+                                    className="w-full text-left px-4 py-3 rounded-xl bg-red-50/80 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors flex items-center gap-3 backdrop-blur-sm"
+                                >
+                                    <span>🚪</span> Logout
+                                </button>
+                            ) : (
+                                <div className="space-y-2">
+                                    <button
+                                        onClick={() => { onNavigateToLogin?.(); onClose(); }}
+                                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 dark:hover:bg-slate-700/50 font-semibold text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-3 backdrop-blur-sm"
+                                    >
+                                        <span>🔑</span> Sign In
+                                    </button>
+                                    <button
+                                        onClick={() => { onNavigateToRegister?.(); onClose(); }}
+                                        className="w-full text-left px-4 py-3 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary font-bold hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors flex items-center gap-3 backdrop-blur-sm"
+                                    >
+                                        <span>✨</span> Register
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </motion.div>
                 </>

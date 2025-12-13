@@ -11,9 +11,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
         const variants = {
             primary: "bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90",
-            secondary: "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200",
+            secondary: "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700",
             danger: "bg-red-500 text-white hover:bg-red-600",
-            ghost: "bg-transparent text-slate-600 hover:bg-slate-100 shadow-none"
+            ghost: "bg-transparent text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-none"
         };
 
         const widthStyles = fullWidth ? "w-full flex justify-center" : "";
