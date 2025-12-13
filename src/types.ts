@@ -41,3 +41,21 @@ export interface Instruction {
 export interface CreateRecipeResponse {
     data: APIRecipe;
 }
+
+export interface Category {
+    _id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    image: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Tag {
+    _id: string;
+    name: string;
+    slug: string;
+    created_at: string;
+    updated_at: string;
+}

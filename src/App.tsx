@@ -120,7 +120,14 @@ const App: React.FC = () => {
         }
     };
 
-    const [currentView, setCurrentView] = useState<'home' | 'analyze' | 'create-recipe'>('home');
+    const [currentView, setCurrentView] = useState<'home' | 'analyze' | 'create-recipe'>(() => {
+        const savedView = localStorage.getItem('currentView');
+        return (savedView as 'home' | 'analyze' | 'create-recipe') || 'home';
+    });
+
+    React.useEffect(() => {
+        localStorage.setItem('currentView', currentView);
+    }, [currentView]);
 
     const handleNavigateToHome = () => {
         setCurrentView('home');

@@ -34,7 +34,7 @@ export const apiFetch = async <T>(endpoint: string, options: FetchOptions = {}):
         const errorData = await response.json().catch(() => ({}));
 
         const errorMessage = errorData.message ||
-            (Array.isArray(errorData.errors) ? errorData.errors.map((e: any) => e.msg).join(', ') : errorData.errors) ||
+            (Array.isArray(errorData.errors) ? errorData.errors.map((e: any) => typeof e === 'string' ? e : e.msg).join(', ') : errorData.errors) ||
             errorData.error ||
             `Error: ${response.status} ${response.statusText}`;
 
